@@ -1,0 +1,85 @@
+
+/* 操作卡片 */
+.action-card.data-v-e6e5e79f {
+	margin-bottom: 24rpx;
+}
+.form-title.data-v-e6e5e79f {
+	font-size: 32rpx;
+	font-weight: bold;
+	margin-bottom: 24rpx;
+	color: #333;
+}
+.setting-row.data-v-e6e5e79f {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 16rpx 0;
+	border-bottom: 1rpx solid #f0f0f0;
+}
+.setting-label.data-v-e6e5e79f {
+	font-size: 28rpx;
+	color: #666;
+}
+.setting-value.data-v-e6e5e79f {
+	font-size: 26rpx;
+	color: #999;
+}
+.picker-value.data-v-e6e5e79f {
+	font-size: 28rpx;
+	color: #4A90D9;
+}
+
+/* 分区标题 */
+.section-title.data-v-e6e5e79f {
+	font-size: 30rpx;
+	font-weight: bold;
+	margin: 32rpx 0 16rpx;
+	color: #333;
+}
+
+/* 空状态 */
+.empty-tip.data-v-e6e5e79f {
+	text-align: center;
+	padding: 60rpx 0;
+	color: #ccc;
+	font-size: 28rpx;
+}
+
+/* 排班行 */
+.schedule-row.data-v-e6e5e79f {
+	display: flex;
+	align-items: center;
+	padding: 20rpx 0;
+	border-bottom: 1rpx solid #f5f5f5;
+}
+.schedule-row.data-v-e6e5e79f:last-child {
+	border-bottom: none;
+}
+.schedule-date.data-v-e6e5e79f {
+	width: 200rpx;
+	font-size: 26rpx;
+	color: #333;
+}
+.schedule-weekday.data-v-e6e5e79f {
+	width: 120rpx;
+	font-size: 26rpx;
+	color: #888;
+	text-align: center;
+}
+.schedule-person.data-v-e6e5e79f {
+	flex: 1;
+	font-size: 30rpx;
+	color: #4A90D9;
+	font-weight: bold;
+	text-align: right;
+}
+
+/* 历史排班 */
+.history-title.data-v-e6e5e79f {
+	font-size: 26rpx;
+	color: #999;
+	margin-bottom: 12rpx;
+}
+.history-row.data-v-e6e5e79f {
+	opacity: 0.7;
+}

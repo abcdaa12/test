@@ -1,0 +1,63 @@
+
+/* 表单区域 */
+.form-card.data-v-fe67f23b {
+	margin-top: 24rpx;
+}
+.form-title.data-v-fe67f23b {
+	font-size: 32rpx;
+	font-weight: bold;
+	margin-bottom: 24rpx;
+	color: #333;
+}
+
+/* 分区标题 */
+.section-title.data-v-fe67f23b {
+	font-size: 30rpx;
+	font-weight: bold;
+	margin: 32rpx 0 16rpx;
+	color: #333;
+}
+
+/* 空状态提示 */
+.empty-tip.data-v-fe67f23b {
+	text-align: center;
+	padding: 60rpx 0;
+	color: #ccc;
+	font-size: 28rpx;
+}
+
+/* 费用条目 */
+.fee-header.data-v-fe67f23b {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 12rpx;
+}
+.fee-title.data-v-fe67f23b {
+	font-size: 30rpx;
+	font-weight: bold;
+}
+.fee-amount.data-v-fe67f23b {
+	font-size: 34rpx;
+	color: #e74c3c;
+	font-weight: bold;
+}
+.fee-detail.data-v-fe67f23b {
+	display: flex;
+	justify-content: space-between;
+	font-size: 26rpx;
+	color: #666;
+	margin-bottom: 8rpx;
+}
+.fee-remark.data-v-fe67f23b {
+	font-size: 24rpx;
+	color: #999;
+	display: block;
+	margin-bottom: 8rpx;
+}
+.fee-time.data-v-fe67f23b {
+	font-size: 22rpx;
+	color: #bbb;
+	display: block;
+	text-align: right;
+}
