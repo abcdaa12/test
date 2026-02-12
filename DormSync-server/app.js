@@ -1,11 +1,11 @@
 /**
- * app.js - DormSync 后端入口文件
+ * app.js - DormSync 宿舍管理平台后端入口
  * 职责：加载环境变量、连接数据库、挂载中间件和路由、启动 HTTP 服务
  */
 const express = require('express')
-const cors = require('cors')
 const dotenv = require('dotenv')
 const connectDB = require('./config/db')
+const corsMiddleware = require('./middlewares/corsMiddleware')
 const errorHandler = require('./middlewares/errorHandler')
 
 // 1. 加载 .env 环境变量
@@ -15,18 +15,23 @@ dotenv.config()
 const app = express()
 
 // 3. 全局中间件
-app.use(cors())                         // 跨域支持
-app.use(express.json())                 // 解析 JSON 请求体
+app.use(corsMiddleware)                          // 跨域支持
+app.use(express.json())                          // 解析 JSON 请求体
 app.use(express.urlencoded({ extended: true }))  // 解析 URL 编码请求体
+app.use('/uploads', express.static('uploads'))   // 静态文件服务（头像等）
 
 // 4. 挂载业务路由（统一前缀 /api）
-app.use('/api/fee', require('./routes/fee'))
-app.use('/api/vote', require('./routes/vote'))
-app.use('/api/schedule', require('./routes/schedule'))
+app.use('/api/user', require('./routes/user'))
+app.use('/api/dorm', require('./routes/dorm'))
+app.use('/api/todo', require('./routes/todo'))
+app.use('/api/message', require('./routes/message'))
+app.use('/api/decision', require('./routes/decision'))
+app.use('/api/task', require('./routes/task'))
+app.use('/api/finance', require('./routes/finance'))
 
 // 5. 健康检查接口
 app.get('/', (req, res) => {
-    res.json({ code: 0, message: 'DormSync API 服务运行中 🚀' })
+    res.json({ code: 200, msg: 'DormSync API 服务运行中 🚀', data: null })
 })
 
 // 6. 全局错误处理（必须放在路由之后）

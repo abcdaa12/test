@@ -1,16 +1,18 @@
 {
   "pages": [
+    "pages/login/login",
     "pages/index/index",
     "pages/message/message",
     "pages/more/more",
     "pages/mine/mine",
     "pages/fee/fee",
     "pages/vote/vote",
-    "pages/schedule/schedule"
+    "pages/schedule/schedule",
+    "pages/profile-edit/profile-edit"
   ],
   "window": {
     "navigationBarTextStyle": "white",
-    "navigationBarTitleText": "DormSync",
+    "navigationBarTitleText": "宿舍管理平台",
     "navigationBarBackgroundColor": "#1677FF",
     "backgroundColor": "#F5F5F5"
   },

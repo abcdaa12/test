@@ -1,66 +1,30 @@
-// pages/more/more.js
-Page({
-
-  /**
-   * 页面的初始数据
-   */
-  data: {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad(options) {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
-
+"use strict";
+const common_vendor = require("../../common/vendor.js");
+const _sfc_main = {
+  __name: "more",
+  setup(__props) {
+    const goTo = (url) => {
+      common_vendor.index.navigateTo({ url });
+    };
+    const handleEntry = (name) => {
+      common_vendor.index.showToast({ title: `${name}功能开发中`, icon: "none" });
+    };
+    return (_ctx, _cache) => {
+      return {
+        a: common_vendor.o(($event) => goTo("/pages/vote/vote")),
+        b: common_vendor.o(($event) => goTo("/pages/vote/vote")),
+        c: common_vendor.o(($event) => goTo("/pages/schedule/schedule")),
+        d: common_vendor.o(($event) => goTo("/pages/schedule/schedule")),
+        e: common_vendor.o(($event) => handleEntry("查看成员")),
+        f: common_vendor.o(($event) => handleEntry("宿舍长选举")),
+        g: common_vendor.o(($event) => handleEntry("离开宿舍")),
+        h: common_vendor.o(($event) => handleEntry("邀请新成员")),
+        i: common_vendor.o(($event) => goTo("/pages/fee/fee")),
+        j: common_vendor.o(($event) => goTo("/pages/fee/fee"))
+      };
+    };
   }
-})
+};
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-ac368486"]]);
+wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/more/more.js.map

@@ -1,5 +1,4 @@
 {
-  "navigationBarTitleText": "DormSync 宿舍协同",
-  "navigationStyle": "custom",
+  "navigationBarTitleText": "宿舍管理平台",
   "usingComponents": {}
 }

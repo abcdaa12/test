@@ -1,48 +1,59 @@
 <template>
 	<!-- 我的页面：个人信息、操作区 -->
 	<view class="page">
-		<!-- 顶部个人信息区（蓝色背景） -->
+		<!-- 顶部个人信息区（蓝色背景，紧接原生导航栏下方） -->
 		<view class="profile-header">
-			<!-- 头像 -->
+			<!-- 头像：有 avatarUrl 时显示图片，否则显示默认图标 -->
 			<view class="avatar-wrap">
-				<text class="avatar-icon">👤</text>
+				<image
+					v-if="userInfo.avatarUrl"
+					class="avatar-img"
+					:src="userInfo.avatarUrl"
+					mode="aspectFill"
+				/>
+				<text v-else class="avatar-icon">👤</text>
 			</view>
 			<!-- 昵称 -->
 			<text class="profile-name">{{ userInfo.nickname }}</text>
 			<!-- 个性签名 -->
-			<text class="profile-sign">{{ userInfo.signature }}</text>
+			<text class="profile-sign">{{ userInfo.signature || '这个人很懒，什么都没写~' }}</text>
 		</view>
 
 		<view class="container">
-			<!-- 个人信息区 -->
-			<view class="info-card">
-				<view class="info-item" @tap="editField('phone')">
-					<text class="info-icon">📱</text>
-					<view class="info-content">
-						<text class="info-label">电话</text>
-						<text class="info-value">{{ userInfo.phone }}</text>
-					</view>
-					<!-- 点击修改提示 -->
-					<text class="info-action">点击修改 ›</text>
-				</view>
-				<view class="info-item" @tap="editField('className')">
-					<text class="info-icon">🎓</text>
-					<view class="info-content">
-						<text class="info-label">班级</text>
-						<text class="info-value">{{ userInfo.className }}</text>
-					</view>
-					<!-- 点击修改提示 -->
-					<text class="info-action">点击修改 ›</text>
-				</view>
+			<!-- 未登录时显示登录按钮 -->
+			<view v-if="!loggedIn" class="login-card">
+				<text class="login-tip">您尚未登录，请先登录以使用完整功能</text>
+				<button class="btn-login" @tap="handleLogin">微信一键登录</button>
 			</view>
 
-			<!-- 操作区 -->
-			<view class="action-section">
-				<view class="action-btn" @tap="editProfile">
-					<text class="action-text">修改个人信息</text>
+			<!-- 已登录时显示个人信息 -->
+			<view v-else>
+				<!-- 个人信息区 -->
+				<view class="info-card">
+					<view class="info-item">
+						<text class="info-icon">📱</text>
+						<view class="info-content">
+							<text class="info-label">电话</text>
+							<text class="info-value">{{ userInfo.phone || '未设置' }}</text>
+						</view>
+					</view>
+					<view class="info-item">
+						<text class="info-icon">🎓</text>
+						<view class="info-content">
+							<text class="info-label">班级</text>
+							<text class="info-value">{{ userInfo.className || '未设置' }}</text>
+						</view>
+					</view>
 				</view>
-				<view class="action-btn logout-btn" @tap="logout">
-					<text class="action-text logout-text">退出登录</text>
+
+				<!-- 操作区 -->
+				<view class="action-section">
+					<view class="action-btn" @tap="editProfile">
+						<text class="action-text">修改个人信息</text>
+					</view>
+					<view class="action-btn logout-btn" @tap="logout">
+						<text class="action-text logout-text">退出登录</text>
+					</view>
 				</view>
 			</view>
 		</view>
@@ -52,56 +63,94 @@
 <script setup>
 /**
  * 我的页面
- * - 顶部：头像、昵称、个性签名（蓝色背景白色文字）
- * - 信息区：电话、班级（可点击修改）
- * - 操作区：修改个人信息、退出登录
+ * - 自动从本地存储读取用户信息
+ * - 未登录时显示登录按钮，点击触发微信登录
+ * - 已登录时显示头像、昵称、个人信息
+ * - 退出登录清除本地登录态
  */
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { wxLogin, isLoggedIn, getLocalUserInfo, clearAuth } from '../../utils/auth.js'
 
-// 用户信息（占位数据，后续从接口/缓存获取）
+// 登录状态
+const loggedIn = ref(false)
+
+// 用户信息（响应式对象）
 const userInfo = reactive({
-	nickname: '张三',
-	signature: '开心生活每一天',
-	phone: '138XXXX1234',
-	className: '计算机2201班'
+	nickname: '宿舍成员',
+	avatarUrl: '',
+	signature: '',
+	phone: '',
+	className: ''
 })
 
 /**
- * 点击修改某个字段（占位逻辑）
- * @param {string} field - 字段名
+ * 从本地存储加载用户信息
  */
-const editField = (field) => {
-	const labels = { phone: '电话', className: '班级' }
-	uni.showToast({ title: `修改${labels[field]}功能开发中`, icon: 'none' })
+const loadUserInfo = () => {
+	loggedIn.value = isLoggedIn()
+	if (loggedIn.value) {
+		const info = getLocalUserInfo()
+		userInfo.nickname = info.nickname || '宿舍成员'
+		userInfo.avatarUrl = info.avatarUrl || ''
+		userInfo.signature = info.signature || ''
+		userInfo.phone = info.phone || ''
+		userInfo.className = info.className || ''
+	}
 }
 
 /**
- * 修改个人信息（占位逻辑）
+ * 手动触发微信登录（未登录时点击按钮）
  */
+const handleLogin = async () => {
+	try {
+		const info = await wxLogin()
+		// 登录成功，刷新页面数据
+		loadUserInfo()
+		uni.showToast({ title: '登录成功', icon: 'success' })
+	} catch (err) {
+		console.error('手动登录失败：', err)
+		// wxLogin 内部已有 toast 提示，此处不重复
+	}
+}
+
+/** 修改个人信息 */
 const editProfile = () => {
-	uni.showToast({ title: '修改个人信息功能开发中', icon: 'none' })
+	uni.navigateTo({ url: '/pages/profile-edit/profile-edit' })
 }
 
-/**
- * 退出登录（占位逻辑）
- */
+/** 退出登录 */
 const logout = () => {
 	uni.showModal({
 		title: '提示',
 		content: '确定要退出登录吗？',
 		success: (res) => {
 			if (res.confirm) {
-				// TODO: 清除本地登录态，跳转登录页
-				uni.removeStorageSync('token')
+				// 清除所有本地登录态
+				clearAuth()
+				// 重置页面状态
+				loggedIn.value = false
+				userInfo.nickname = '宿舍成员'
+				userInfo.avatarUrl = ''
+				userInfo.signature = ''
+				userInfo.phone = ''
+				userInfo.className = ''
 				uni.showToast({ title: '已退出登录', icon: 'none' })
 			}
 		}
 	})
 }
+
+/**
+ * 每次页面显示时刷新用户信息
+ * 处理场景：从其他页面返回、App.vue 自动登录完成后切到此页
+ */
+onShow(() => {
+	loadUserInfo()
+})
 </script>
 
 <style scoped>
-/* 页面容器 */
 .page {
 	min-height: 100vh;
 	background-color: #f5f5f5;
@@ -110,13 +159,11 @@ const logout = () => {
 /* 顶部个人信息区 */
 .profile-header {
 	background-color: #1677FF;
-	padding: 80rpx 30rpx 50rpx;
+	padding: 40rpx 30rpx 50rpx;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 }
-
-/* 头像 */
 .avatar-wrap {
 	width: 140rpx;
 	height: 140rpx;
@@ -126,29 +173,53 @@ const logout = () => {
 	align-items: center;
 	justify-content: center;
 	margin-bottom: 20rpx;
+	overflow: hidden;
+}
+.avatar-img {
+	width: 140rpx;
+	height: 140rpx;
+	border-radius: 50%;
 }
 .avatar-icon {
 	font-size: 70rpx;
 }
-
-/* 昵称 */
 .profile-name {
 	color: #fff;
 	font-size: 36rpx;
 	font-weight: bold;
 	margin-bottom: 10rpx;
 }
-
-/* 个性签名 */
 .profile-sign {
 	color: rgba(255, 255, 255, 0.8);
 	font-size: 26rpx;
 }
 
-/* 内容区 */
 .container {
 	padding: 24rpx;
 	margin-top: -20rpx;
+}
+
+/* 未登录提示卡片 */
+.login-card {
+	background-color: #fff;
+	border-radius: 16rpx;
+	padding: 48rpx 32rpx;
+	text-align: center;
+	box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+.login-tip {
+	font-size: 28rpx;
+	color: #999;
+	display: block;
+	margin-bottom: 32rpx;
+}
+.btn-login {
+	background-color: #1677FF;
+	color: #fff;
+	border-radius: 12rpx;
+	font-size: 30rpx;
+	height: 80rpx;
+	line-height: 80rpx;
 }
 
 /* 信息卡片 */
@@ -185,11 +256,6 @@ const logout = () => {
 .info-value {
 	font-size: 30rpx;
 	color: #333;
-}
-.info-action {
-	font-size: 24rpx;
-	color: #1677FF;
-	flex-shrink: 0;
 }
 
 /* 操作区 */

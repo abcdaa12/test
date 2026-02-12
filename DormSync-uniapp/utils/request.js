@@ -5,7 +5,7 @@
  */
 
 // 后端接口基础地址
-const BASE_URL = 'http://localhost:3000'
+export const BASE_URL = 'http://172.20.42.135:3000'
 
 // 请求超时时间（毫秒）
 const TIMEOUT = 10000
@@ -49,8 +49,15 @@ const request = (options = {}) => {
                     // 请求成功，返回数据
                     resolve(data)
                 } else if (statusCode === 401) {
-                    // 未授权，提示并跳转登录（预留）
-                    uni.showToast({ title: '请先登录', icon: 'none' })
+                    // 令牌过期或无效，清除本地登录态并提示重新登录
+                    uni.removeStorageSync('token')
+                    uni.removeStorageSync('userInfo')
+                    uni.removeStorageSync('userId')
+                    uni.showToast({ title: '登录已过期，请重新登录', icon: 'none' })
+                    // 延迟跳转到"我的"页面触发重新登录
+                    setTimeout(() => {
+                        uni.switchTab({ url: '/pages/mine/mine' })
+                    }, 1500)
                     reject(res)
                 } else {
                     // 其他错误

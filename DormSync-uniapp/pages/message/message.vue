@@ -1,11 +1,6 @@
 <template>
 	<!-- 消息页面：搜索、筛选、消息列表（支持左滑操作） -->
 	<view class="page">
-		<!-- 自定义导航栏 -->
-		<view class="nav-bar">
-			<text class="nav-title">消息中心</text>
-		</view>
-
 		<view class="container">
 			<!-- 顶部：搜索框 + 筛选按钮 -->
 			<view class="search-bar">
@@ -99,6 +94,7 @@
 <script setup>
 /**
  * 消息页面
+ * - 使用原生导航栏（标题"消息中心"在 pages.json 中配置）
  * - 顶部搜索框 + 筛选弹窗（按状态：未读/已读/全部，按类型：投票/事务/财务）
  * - 消息列表：状态 + 类型 + 内容 + 时间
  * - 左滑显示"标记已读/删除"按钮（占位交互）
@@ -145,12 +141,9 @@ const messageList = ref([
  */
 const filteredMessages = computed(() => {
 	return messageList.value.filter(msg => {
-		// 搜索过滤
 		if (searchText.value && !msg.content.includes(searchText.value)) return false
-		// 状态过滤
 		if (filterStatus.value === 'unread' && msg.read) return false
 		if (filterStatus.value === 'read' && !msg.read) return false
-		// 类型过滤
 		if (filterType.value !== 'all' && msg.type !== filterType.value) return false
 		return true
 	})
@@ -167,7 +160,6 @@ const onTouchMove = (e, index) => {
 	const diff = e.touches[0].clientX - startX
 	const msg = filteredMessages.value[index]
 	if (diff < 0) {
-		// 左滑，最大滑动 -200rpx
 		msg._offsetX = Math.max(diff * 2, -200)
 	} else {
 		msg._offsetX = 0
@@ -176,22 +168,17 @@ const onTouchMove = (e, index) => {
 
 const onTouchEnd = (index) => {
 	const msg = filteredMessages.value[index]
-	// 滑动超过一半则保持展开，否则收回
 	msg._offsetX = (msg._offsetX || 0) < -100 ? -200 : 0
 }
 
-/**
- * 标记已读（占位逻辑）
- */
+/** 标记已读（占位逻辑） */
 const markRead = (index) => {
 	filteredMessages.value[index].read = true
 	filteredMessages.value[index]._offsetX = 0
 	uni.showToast({ title: '已标记为已读', icon: 'none' })
 }
 
-/**
- * 删除消息（占位逻辑）
- */
+/** 删除消息（占位逻辑） */
 const deleteMsg = (index) => {
 	const msg = filteredMessages.value[index]
 	const realIndex = messageList.value.indexOf(msg)
@@ -203,25 +190,10 @@ const deleteMsg = (index) => {
 </script>
 
 <style scoped>
-/* 页面容器 */
 .page {
 	min-height: 100vh;
 	background-color: #f5f5f5;
 }
-
-/* 自定义导航栏 */
-.nav-bar {
-	background-color: #1677FF;
-	padding: 60rpx 30rpx 24rpx;
-	text-align: center;
-}
-.nav-title {
-	color: #fff;
-	font-size: 34rpx;
-	font-weight: bold;
-}
-
-/* 内容区 */
 .container {
 	padding: 24rpx;
 }
@@ -331,8 +303,6 @@ const deleteMsg = (index) => {
 	margin-bottom: 16rpx;
 	border-radius: 12rpx;
 }
-
-/* 消息主体 */
 .msg-item {
 	background-color: #fff;
 	padding: 24rpx;

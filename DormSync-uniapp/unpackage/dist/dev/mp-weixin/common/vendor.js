@@ -7909,6 +7909,11 @@ const onLaunch = /* @__PURE__ */ createLifeCycleHook(
   1
   /* HookFlags.APP */
 );
+const onLoad = /* @__PURE__ */ createLifeCycleHook(
+  ON_LOAD,
+  2
+  /* HookFlags.PAGE */
+);
 exports._export_sfc = _export_sfc;
 exports.computed = computed;
 exports.createSSRApp = createSSRApp;
@@ -7919,6 +7924,7 @@ exports.n = n;
 exports.o = o;
 exports.onHide = onHide;
 exports.onLaunch = onLaunch;
+exports.onLoad = onLoad;
 exports.onMounted = onMounted;
 exports.onShow = onShow;
 exports.reactive = reactive;
