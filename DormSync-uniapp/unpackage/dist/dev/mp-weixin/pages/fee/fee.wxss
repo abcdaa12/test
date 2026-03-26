@@ -1,63 +1,23 @@
 
-/* 表单区域 */
-.form-card.data-v-fe67f23b {
-	margin-top: 24rpx;
+.container.data-v-fe67f23b { min-height: 100vh; background-color: var(--bg-page); padding: 24rpx;
 }
-.form-title.data-v-fe67f23b {
-	font-size: 32rpx;
-	font-weight: bold;
-	margin-bottom: 24rpx;
-	color: #333;
+.form-card.data-v-fe67f23b { margin-top: 24rpx;
 }
-
-/* 分区标题 */
-.section-title.data-v-fe67f23b {
-	font-size: 30rpx;
-	font-weight: bold;
-	margin: 32rpx 0 16rpx;
-	color: #333;
+.form-title.data-v-fe67f23b { font-size: 32rpx; font-weight: bold; margin-bottom: 24rpx; color: var(--text-primary);
 }
-
-/* 空状态提示 */
-.empty-tip.data-v-fe67f23b {
-	text-align: center;
-	padding: 60rpx 0;
-	color: #ccc;
-	font-size: 28rpx;
+.section-title.data-v-fe67f23b { font-size: 30rpx; font-weight: bold; margin: 32rpx 0 16rpx; color: var(--text-primary);
 }
-
-/* 费用条目 */
-.fee-header.data-v-fe67f23b {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 12rpx;
+.empty-tip.data-v-fe67f23b { text-align: center; padding: 60rpx 0; color: var(--text-placeholder); font-size: 28rpx;
 }
-.fee-title.data-v-fe67f23b {
-	font-size: 30rpx;
-	font-weight: bold;
+.fee-header.data-v-fe67f23b { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12rpx;
 }
-.fee-amount.data-v-fe67f23b {
-	font-size: 34rpx;
-	color: #e74c3c;
-	font-weight: bold;
+.fee-title.data-v-fe67f23b { font-size: 30rpx; font-weight: bold; color: var(--text-primary);
 }
-.fee-detail.data-v-fe67f23b {
-	display: flex;
-	justify-content: space-between;
-	font-size: 26rpx;
-	color: #666;
-	margin-bottom: 8rpx;
+.fee-amount.data-v-fe67f23b { font-size: 34rpx; color: #e74c3c; font-weight: bold;
 }
-.fee-remark.data-v-fe67f23b {
-	font-size: 24rpx;
-	color: #999;
-	display: block;
-	margin-bottom: 8rpx;
+.fee-detail.data-v-fe67f23b { display: flex; justify-content: space-between; font-size: 26rpx; color: var(--text-secondary); margin-bottom: 8rpx;
 }
-.fee-time.data-v-fe67f23b {
-	font-size: 22rpx;
-	color: #bbb;
-	display: block;
-	text-align: right;
+.fee-remark.data-v-fe67f23b { font-size: 24rpx; color: var(--text-hint); display: block; margin-bottom: 8rpx;
+}
+.fee-time.data-v-fe67f23b { font-size: 22rpx; color: var(--text-placeholder); display: block; text-align: right;
 }

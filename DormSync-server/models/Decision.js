@@ -14,6 +14,11 @@ const decisionSchema = new mongoose.Schema({
         label: { type: String, required: true },
         count: { type: Number, default: 0 }
     }],
+    // 已投票用户记录（防止重复投票）
+    voters: [{
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        optionIndex: { type: Number }
+    }],
     // 截止时间
     deadline: { type: Date, required: [true, '截止时间不能为空'] },
     // 创建者ID

@@ -11,6 +11,12 @@ const { authMiddleware } = require('../middlewares/jwt')
 // 获取宿舍信息（需要鉴权）
 router.get('/info', authMiddleware, dormController.getDormInfo)
 
+// 创建宿舍（需要鉴权）
+router.post('/create', authMiddleware, dormController.createDorm)
+
+// 加入宿舍（需要鉴权）
+router.post('/join', authMiddleware, dormController.joinDorm)
+
 // 查看宿舍成员（需要鉴权）
 router.get('/members', authMiddleware, dormController.getDormMembers)
 
@@ -22,5 +28,8 @@ router.post('/leave', authMiddleware, dormController.leaveDorm)
 
 // 邀请新成员（需要鉴权）
 router.post('/invite', authMiddleware, dormController.inviteMember)
+
+// 更新宿舍公告（需要鉴权）
+router.put('/notice', authMiddleware, dormController.updateNotice)
 
 module.exports = router

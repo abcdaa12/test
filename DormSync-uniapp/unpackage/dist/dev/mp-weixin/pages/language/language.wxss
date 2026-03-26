@@ -1,0 +1,40 @@
+
+.page.data-v-143e30ec {
+	min-height: 100vh;
+	background-color: var(--bg-page, #f5f5f5);
+	padding: 24rpx;
+}
+.lang-card.data-v-143e30ec {
+	background: var(--bg-card, #fff);
+	border-radius: 16rpx;
+	overflow: hidden;
+}
+.lang-item.data-v-143e30ec {
+	display: flex; align-items: center; justify-content: space-between;
+	padding: 32rpx 28rpx;
+	border-bottom: 1rpx solid var(--border-light, #f5f5f5);
+}
+.lang-item.data-v-143e30ec:last-child { border-bottom: none;
+}
+.lang-item.data-v-143e30ec:active { background-color: var(--bg-hover, #f9f9f9);
+}
+.lang-name.data-v-143e30ec { font-size: 30rpx; color: var(--text-primary, #333);
+}
+.lang-check.data-v-143e30ec { font-size: 32rpx; color: var(--color-primary, #1677FF); font-weight: bold;
+}
+
+/* 夜间模式 CSS 变量 */
+.dark-mode.data-v-143e30ec {
+	--bg-page: #121212;
+	--bg-card: #1e1e1e;
+	--bg-input: #2a2a2a;
+	--bg-hover: #2a2a2a;
+	--text-primary: #e0e0e0;
+	--text-secondary: #aaaaaa;
+	--text-placeholder: #666666;
+	--text-hint: #888888;
+	--border-color: #333333;
+	--border-light: #2a2a2a;
+	--shadow-card: 0 2rpx 12rpx rgba(0, 0, 0, 0.3);
+	--color-primary: #5b9bf5;
+}

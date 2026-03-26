@@ -1,59 +1,60 @@
 <template>
-	<!-- 我的页面：个人信息、操作区 -->
-	<view class="page">
-		<!-- 顶部个人信息区（蓝色背景，紧接原生导航栏下方） -->
-		<view class="profile-header">
-			<!-- 头像：有 avatarUrl 时显示图片，否则显示默认图标 -->
+	<view :class="['page', isDark ? 'dark-mode' : '']">
+		<!-- 顶部用户卡片 -->
+		<view class="user-header">
 			<view class="avatar-wrap">
-				<image
-					v-if="userInfo.avatarUrl"
-					class="avatar-img"
-					:src="userInfo.avatarUrl"
-					mode="aspectFill"
-				/>
+				<image v-if="userInfo.avatarUrl" class="avatar-img" :src="userInfo.avatarUrl" mode="aspectFill" />
 				<text v-else class="avatar-icon">👤</text>
 			</view>
-			<!-- 昵称 -->
-			<text class="profile-name">{{ userInfo.nickname }}</text>
-			<!-- 个性签名 -->
-			<text class="profile-sign">{{ userInfo.signature || '这个人很懒，什么都没写~' }}</text>
+			<view class="user-info">
+				<text class="user-name">{{ userInfo.nickname || t('mine.defaultSign') }}</text>
+				<text class="user-sign">{{ userInfo.signature || t('mine.defaultSign') }}</text>
+			</view>
 		</view>
 
 		<view class="container">
-			<!-- 未登录时显示登录按钮 -->
 			<view v-if="!loggedIn" class="login-card">
-				<text class="login-tip">您尚未登录，请先登录以使用完整功能</text>
-				<button class="btn-login" @tap="handleLogin">微信一键登录</button>
+				<text class="login-tip">{{ t('mine.notLogged') }}</text>
+				<button class="btn-login" @tap="handleLogin">{{ t('mine.wxLogin') }}</button>
 			</view>
 
-			<!-- 已登录时显示个人信息 -->
 			<view v-else>
-				<!-- 个人信息区 -->
-				<view class="info-card">
-					<view class="info-item">
-						<text class="info-icon">📱</text>
-						<view class="info-content">
-							<text class="info-label">电话</text>
-							<text class="info-value">{{ userInfo.phone || '未设置' }}</text>
-						</view>
-					</view>
-					<view class="info-item">
-						<text class="info-icon">🎓</text>
-						<view class="info-content">
-							<text class="info-label">班级</text>
-							<text class="info-value">{{ userInfo.className || '未设置' }}</text>
-						</view>
+				<view class="menu-card">
+					<view class="menu-item" @click="goProfile">
+						<text class="menu-icon">👤</text>
+						<text class="menu-text">{{ t('mine.profile') }}</text>
+						<text class="menu-arrow">›</text>
 					</view>
 				</view>
 
-				<!-- 操作区 -->
-				<view class="action-section">
-					<view class="action-btn" @tap="editProfile">
-						<text class="action-text">修改个人信息</text>
+				<view class="menu-card">
+					<view class="menu-item" @click="goPage('/pages/language/language')">
+						<text class="menu-icon">🌐</text>
+						<text class="menu-text">{{ t('mine.language') }}</text>
+						<text class="menu-arrow">›</text>
 					</view>
-					<view class="action-btn logout-btn" @tap="logout">
-						<text class="action-text logout-text">退出登录</text>
+					<view class="menu-item" @click="toggleDarkMode">
+						<text class="menu-icon">🌙</text>
+						<text class="menu-text">{{ t('mine.darkMode') }}</text>
+						<switch :checked="isDark" color="#1677FF" style="transform: scale(0.7);" />
 					</view>
+				</view>
+
+				<view class="menu-card">
+					<view class="menu-item" @click="goPage('/pages/about/about')">
+						<text class="menu-icon">ℹ️</text>
+						<text class="menu-text">{{ t('mine.about') }}</text>
+						<text class="menu-arrow">›</text>
+					</view>
+					<view class="menu-item" @click="goPage('/pages/terms/terms')">
+						<text class="menu-icon">📄</text>
+						<text class="menu-text">{{ t('mine.terms') }}</text>
+						<text class="menu-arrow">›</text>
+					</view>
+				</view>
+
+				<view class="logout-btn" @click="logout">
+					<text class="logout-text">{{ t('mine.logout') }}</text>
 				</view>
 			</view>
 		</view>
@@ -61,227 +62,107 @@
 </template>
 
 <script setup>
-/**
- * 我的页面
- * - 自动从本地存储读取用户信息
- * - 未登录时显示登录按钮，点击触发微信登录
- * - 已登录时显示头像、昵称、个人信息
- * - 退出登录清除本地登录态
- */
 import { reactive, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { wxLogin, isLoggedIn, getLocalUserInfo, clearAuth } from '../../utils/auth.js'
+import { t } from '../../utils/i18n.js'
+import { isDark, toggleDark, applyNavBarTheme } from '../../utils/theme.js'
 
-// 登录状态
 const loggedIn = ref(false)
+const userInfo = reactive({ nickname: '', avatarUrl: '', signature: '' })
 
-// 用户信息（响应式对象）
-const userInfo = reactive({
-	nickname: '宿舍成员',
-	avatarUrl: '',
-	signature: '',
-	phone: '',
-	className: ''
-})
-
-/**
- * 从本地存储加载用户信息
- */
 const loadUserInfo = () => {
 	loggedIn.value = isLoggedIn()
 	if (loggedIn.value) {
 		const info = getLocalUserInfo()
-		userInfo.nickname = info.nickname || '宿舍成员'
+		userInfo.nickname = info.nickname || ''
 		userInfo.avatarUrl = info.avatarUrl || ''
 		userInfo.signature = info.signature || ''
-		userInfo.phone = info.phone || ''
-		userInfo.className = info.className || ''
 	}
 }
 
-/**
- * 手动触发微信登录（未登录时点击按钮）
- */
 const handleLogin = async () => {
 	try {
-		const info = await wxLogin()
-		// 登录成功，刷新页面数据
+		await wxLogin()
 		loadUserInfo()
-		uni.showToast({ title: '登录成功', icon: 'success' })
-	} catch (err) {
-		console.error('手动登录失败：', err)
-		// wxLogin 内部已有 toast 提示，此处不重复
-	}
+		uni.showToast({ title: t('mine.loginSuccess'), icon: 'success' })
+	} catch (err) { console.error(err) }
 }
 
-/** 修改个人信息 */
-const editProfile = () => {
-	uni.navigateTo({ url: '/pages/profile-edit/profile-edit' })
+const goProfile = () => {
+	if (loggedIn.value) uni.navigateTo({ url: '/pages/profile-edit/profile-edit' })
+}
+const goPage = (url) => uni.navigateTo({ url })
+
+const toggleDarkMode = () => {
+	toggleDark()
+	uni.showToast({ title: isDark.value ? t('mine.darkOn') : t('mine.darkOff'), icon: 'none' })
 }
 
-/** 退出登录 */
 const logout = () => {
 	uni.showModal({
-		title: '提示',
-		content: '确定要退出登录吗？',
+		title: t('mine.tip'),
+		content: t('mine.logoutConfirm'),
 		success: (res) => {
 			if (res.confirm) {
-				// 清除所有本地登录态
 				clearAuth()
-				// 重置页面状态
 				loggedIn.value = false
-				userInfo.nickname = '宿舍成员'
+				userInfo.nickname = ''
 				userInfo.avatarUrl = ''
 				userInfo.signature = ''
-				userInfo.phone = ''
-				userInfo.className = ''
-				uni.showToast({ title: '已退出登录', icon: 'none' })
+				uni.showToast({ title: t('mine.logoutDone'), icon: 'none' })
 			}
 		}
 	})
 }
 
-/**
- * 每次页面显示时刷新用户信息
- * 处理场景：从其他页面返回、App.vue 自动登录完成后切到此页
- */
 onShow(() => {
+	applyNavBarTheme()
 	loadUserInfo()
+	uni.setNavigationBarTitle({ title: t('tab.mine') })
 })
 </script>
 
 <style scoped>
-.page {
-	min-height: 100vh;
-	background-color: #f5f5f5;
-}
-
-/* 顶部个人信息区 */
-.profile-header {
-	background-color: #1677FF;
-	padding: 40rpx 30rpx 50rpx;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+.page { min-height: 100vh; background-color: var(--bg-page); }
+.user-header {
+	background: linear-gradient(135deg, #1677FF, #4A9FFF);
+	padding: 50rpx 30rpx 40rpx; display: flex; align-items: center;
 }
 .avatar-wrap {
-	width: 140rpx;
-	height: 140rpx;
-	border-radius: 50%;
-	background-color: rgba(255, 255, 255, 0.3);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-bottom: 20rpx;
-	overflow: hidden;
+	width: 120rpx; height: 120rpx; border-radius: 50%;
+	background: rgba(255,255,255,0.3); overflow: hidden;
+	display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.avatar-img {
-	width: 140rpx;
-	height: 140rpx;
-	border-radius: 50%;
-}
-.avatar-icon {
-	font-size: 70rpx;
-}
-.profile-name {
-	color: #fff;
-	font-size: 36rpx;
-	font-weight: bold;
-	margin-bottom: 10rpx;
-}
-.profile-sign {
-	color: rgba(255, 255, 255, 0.8);
-	font-size: 26rpx;
-}
-
-.container {
-	padding: 24rpx;
-	margin-top: -20rpx;
-}
-
-/* 未登录提示卡片 */
+.avatar-img { width: 120rpx; height: 120rpx; border-radius: 50%; }
+.avatar-icon { font-size: 60rpx; }
+.user-info { flex: 1; margin-left: 24rpx; }
+.user-name { font-size: 34rpx; font-weight: bold; color: #fff; display: block; margin-bottom: 8rpx; }
+.user-sign { font-size: 24rpx; color: rgba(255,255,255,0.8); display: block; }
+.container { padding: 24rpx; }
 .login-card {
-	background-color: #fff;
-	border-radius: 16rpx;
-	padding: 48rpx 32rpx;
-	text-align: center;
-	box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+	background: var(--bg-card); border-radius: 16rpx; padding: 48rpx 32rpx;
+	text-align: center; box-shadow: var(--shadow-card);
 }
-.login-tip {
-	font-size: 28rpx;
-	color: #999;
-	display: block;
-	margin-bottom: 32rpx;
+.login-tip { font-size: 28rpx; color: var(--text-hint); display: block; margin-bottom: 32rpx; }
+.btn-login { background-color: var(--color-primary); color: #fff; border-radius: 12rpx; font-size: 30rpx; height: 80rpx; line-height: 80rpx; }
+.menu-card {
+	background: var(--bg-card); border-radius: 16rpx; overflow: hidden;
+	margin-bottom: 24rpx; box-shadow: var(--shadow-card);
 }
-.btn-login {
-	background-color: #1677FF;
-	color: #fff;
-	border-radius: 12rpx;
-	font-size: 30rpx;
-	height: 80rpx;
-	line-height: 80rpx;
+.menu-item {
+	display: flex; align-items: center; padding: 30rpx 24rpx;
+	border-bottom: 1rpx solid var(--border-light);
 }
-
-/* 信息卡片 */
-.info-card {
-	background-color: #fff;
-	border-radius: 16rpx;
-	overflow: hidden;
-	margin-bottom: 32rpx;
-	box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
-}
-.info-item {
-	display: flex;
-	align-items: center;
-	padding: 28rpx 24rpx;
-	border-bottom: 1rpx solid #f5f5f5;
-}
-.info-item:last-child {
-	border-bottom: none;
-}
-.info-icon {
-	font-size: 36rpx;
-	margin-right: 20rpx;
-	flex-shrink: 0;
-}
-.info-content {
-	flex: 1;
-}
-.info-label {
-	font-size: 24rpx;
-	color: #999;
-	display: block;
-	margin-bottom: 4rpx;
-}
-.info-value {
-	font-size: 30rpx;
-	color: #333;
-}
-
-/* 操作区 */
-.action-section {
-	display: flex;
-	flex-direction: column;
-	gap: 20rpx;
-}
-.action-btn {
-	background-color: #fff;
-	border: 2rpx solid #1677FF;
-	border-radius: 12rpx;
-	padding: 24rpx;
-	text-align: center;
-}
-.action-btn:active {
-	background-color: #f0f7ff;
-}
-.action-text {
-	font-size: 30rpx;
-	color: #1677FF;
-}
+.menu-item:last-child { border-bottom: none; }
+.menu-item:active { background-color: var(--bg-hover); }
+.menu-icon { font-size: 36rpx; margin-right: 20rpx; flex-shrink: 0; }
+.menu-text { flex: 1; font-size: 30rpx; color: var(--text-primary); }
+.menu-arrow { font-size: 30rpx; color: var(--text-hint); }
 .logout-btn {
-	border-color: #ff4d4f;
+	margin-top: 40rpx; background: var(--bg-card); border-radius: 16rpx;
+	padding: 28rpx; text-align: center; box-shadow: var(--shadow-card);
 }
-.logout-text {
-	color: #ff4d4f;
-}
+.logout-btn:active { background-color: #fff5f5; }
+.logout-text { font-size: 30rpx; color: #ff4d4f; }
 </style>

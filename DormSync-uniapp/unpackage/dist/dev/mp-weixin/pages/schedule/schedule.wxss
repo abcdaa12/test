@@ -1,85 +1,33 @@
 
-/* 操作卡片 */
-.action-card.data-v-e6e5e79f {
-	margin-bottom: 24rpx;
+.container.data-v-e6e5e79f { min-height: 100vh; background-color: var(--bg-page); padding: 24rpx;
 }
-.form-title.data-v-e6e5e79f {
-	font-size: 32rpx;
-	font-weight: bold;
-	margin-bottom: 24rpx;
-	color: #333;
+.action-card.data-v-e6e5e79f { margin-bottom: 24rpx;
 }
-.setting-row.data-v-e6e5e79f {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 16rpx 0;
-	border-bottom: 1rpx solid #f0f0f0;
+.form-title.data-v-e6e5e79f { font-size: 32rpx; font-weight: bold; margin-bottom: 24rpx; color: var(--text-primary);
 }
-.setting-label.data-v-e6e5e79f {
-	font-size: 28rpx;
-	color: #666;
+.setting-row.data-v-e6e5e79f { display: flex; justify-content: space-between; align-items: center; padding: 16rpx 0; border-bottom: 1rpx solid var(--border-light);
 }
-.setting-value.data-v-e6e5e79f {
-	font-size: 26rpx;
-	color: #999;
+.setting-label.data-v-e6e5e79f { font-size: 28rpx; color: var(--text-secondary);
 }
-.picker-value.data-v-e6e5e79f {
-	font-size: 28rpx;
-	color: #4A90D9;
+.setting-value.data-v-e6e5e79f { font-size: 26rpx; color: var(--text-hint);
 }
-
-/* 分区标题 */
-.section-title.data-v-e6e5e79f {
-	font-size: 30rpx;
-	font-weight: bold;
-	margin: 32rpx 0 16rpx;
-	color: #333;
+.picker-value.data-v-e6e5e79f { font-size: 28rpx; color: var(--color-primary);
 }
-
-/* 空状态 */
-.empty-tip.data-v-e6e5e79f {
-	text-align: center;
-	padding: 60rpx 0;
-	color: #ccc;
-	font-size: 28rpx;
+.section-title.data-v-e6e5e79f { font-size: 30rpx; font-weight: bold; margin: 32rpx 0 16rpx; color: var(--text-primary);
 }
-
-/* 排班行 */
-.schedule-row.data-v-e6e5e79f {
-	display: flex;
-	align-items: center;
-	padding: 20rpx 0;
-	border-bottom: 1rpx solid #f5f5f5;
+.empty-tip.data-v-e6e5e79f { text-align: center; padding: 60rpx 0; color: var(--text-placeholder); font-size: 28rpx;
 }
-.schedule-row.data-v-e6e5e79f:last-child {
-	border-bottom: none;
+.schedule-row.data-v-e6e5e79f { display: flex; align-items: center; padding: 20rpx 0; border-bottom: 1rpx solid var(--border-light);
 }
-.schedule-date.data-v-e6e5e79f {
-	width: 200rpx;
-	font-size: 26rpx;
-	color: #333;
+.schedule-row.data-v-e6e5e79f:last-child { border-bottom: none;
 }
-.schedule-weekday.data-v-e6e5e79f {
-	width: 120rpx;
-	font-size: 26rpx;
-	color: #888;
-	text-align: center;
+.schedule-date.data-v-e6e5e79f { width: 200rpx; font-size: 26rpx; color: var(--text-primary);
 }
-.schedule-person.data-v-e6e5e79f {
-	flex: 1;
-	font-size: 30rpx;
-	color: #4A90D9;
-	font-weight: bold;
-	text-align: right;
+.schedule-weekday.data-v-e6e5e79f { width: 120rpx; font-size: 26rpx; color: var(--text-hint); text-align: center;
 }
-
-/* 历史排班 */
-.history-title.data-v-e6e5e79f {
-	font-size: 26rpx;
-	color: #999;
-	margin-bottom: 12rpx;
+.schedule-person.data-v-e6e5e79f { flex: 1; font-size: 30rpx; color: var(--color-primary); font-weight: bold; text-align: right;
 }
-.history-row.data-v-e6e5e79f {
-	opacity: 0.7;
+.history-title.data-v-e6e5e79f { font-size: 26rpx; color: var(--text-hint); margin-bottom: 12rpx;
+}
+.history-row.data-v-e6e5e79f { opacity: 0.7;
 }

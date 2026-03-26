@@ -54,6 +54,48 @@
 			"style": {
 				"navigationBarTitleText": "个人信息"
 			}
+		},
+		{
+			"path": "pages/language/language",
+			"style": {
+				"navigationBarTitleText": "语言切换"
+			}
+		},
+		{
+			"path": "pages/dorm-setup/dorm-setup",
+			"style": {
+				"navigationBarTitleText": "宿舍设置"
+			}
+		},
+		{
+			"path": "pages/invite/invite",
+			"style": {
+				"navigationBarTitleText": "邀请成员"
+			}
+		},
+		{
+			"path": "pages/members/members",
+			"style": {
+				"navigationBarTitleText": "宿舍成员"
+			}
+		},
+		{
+			"path": "pages/election/election",
+			"style": {
+				"navigationBarTitleText": "宿舍长选举"
+			}
+		},
+		{
+			"path": "pages/about/about",
+			"style": {
+				"navigationBarTitleText": "关于我们"
+			}
+		},
+		{
+			"path": "pages/terms/terms",
+			"style": {
+				"navigationBarTitleText": "用户须知"
+			}
 		}
 	],
 	"globalStyle": {

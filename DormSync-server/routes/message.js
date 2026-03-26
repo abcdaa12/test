@@ -10,11 +10,13 @@ const { authMiddleware } = require('../middlewares/jwt')
 
 // 获取用户消息列表（需要鉴权）
 router.get('/list', authMiddleware, messageController.getMessageList)
-
-// 修改消息状态（需要鉴权）
+router.get('/unread-count', authMiddleware, messageController.getUnreadCount)
 router.put('/update', authMiddleware, messageController.updateMessage)
 
 // 搜索消息（需要鉴权）
 router.get('/search', authMiddleware, messageController.searchMessage)
+
+// 删除消息（需要鉴权）
+router.delete('/delete', authMiddleware, messageController.deleteMessage)
 
 module.exports = router

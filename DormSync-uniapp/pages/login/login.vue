@@ -1,19 +1,17 @@
 <template>
-	<view class="login-page">
+	<view :class="['login-page', isDark ? 'dark-mode' : '']">
 		<view class="login-content">
-			<!-- Logo 区域 -->
 			<view class="logo-section">
 				<image class="logo" src="/static/logo.png" mode="aspectFit" />
 				<text class="app-name">DormSync</text>
-				<text class="app-desc">宿舍协同管理平台</text>
+				<text class="app-desc">{{ t('login.appDesc') }}</text>
 			</view>
 
-			<!-- 登录按钮区域 -->
 			<view class="login-section">
 				<button class="login-btn" :loading="loading" @click="handleLogin">
-					微信一键登录
+					{{ t('login.btn') }}
 				</button>
-				<text class="login-tip">登录即表示同意《用户协议》和《隐私政策》</text>
+				<text class="login-tip">{{ t('login.agreement') }}</text>
 			</view>
 		</view>
 	</view>
@@ -21,15 +19,34 @@
 
 <script setup>
 import { ref } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onShow, onLoad } from '@dcloudio/uni-app'
 import { wxLogin, isLoggedIn } from '../../utils/auth'
+import { t } from '../../utils/i18n'
+import { isDark } from '../../utils/theme.js'
 
 const loading = ref(false)
 
-// 每次显示页面时检查登录态，已登录直接跳首页
+// 页面加载时捕获分享卡片带来的参数
+onLoad((options) => {
+	if (options && options.dormNumber) {
+		const dormNumber = decodeURIComponent(options.dormNumber)
+		console.log('登录页收到邀请宿舍号:', dormNumber)
+		uni.setStorageSync('inviteDormNumber', dormNumber)
+	}
+})
+
+// 每次显示页面时检查登录态
 onShow(() => {
 	if (isLoggedIn()) {
-		goHome()
+		const userInfo = uni.getStorageSync('userInfo') || {}
+		const inviteDorm = uni.getStorageSync('inviteDormNumber')
+		if (inviteDorm && !userInfo.dormId) {
+			// 已登录但没宿舍，有邀请参数 → 跳到加入宿舍页
+			uni.redirectTo({ url: '/pages/dorm-setup/dorm-setup' })
+		} else {
+			uni.removeStorageSync('inviteDormNumber')
+			goHome()
+		}
 	}
 })
 
@@ -48,12 +65,16 @@ const handleLogin = async () => {
 	loading.value = true
 	try {
 		const userInfo = await wxLogin()
-		uni.showToast({ title: '登录成功', icon: 'success' })
+		uni.showToast({ title: t('login.success'), icon: 'success' })
 		setTimeout(() => {
-			// 新用户（昵称还是默认值）跳转到个人信息设置页
 			if (!userInfo.nickname || userInfo.nickname === '宿舍成员') {
 				uni.redirectTo({ url: '/pages/profile-edit/profile-edit?first=1' })
+			} else if (!userInfo.dormId) {
+				// 没有宿舍 → 跳到宿舍设置页（如果有邀请参数会自动预填）
+				uni.redirectTo({ url: '/pages/dorm-setup/dorm-setup' })
 			} else {
+				// 已有宿舍，清除可能残留的邀请参数
+				uni.removeStorageSync('inviteDormNumber')
 				goHome()
 			}
 		}, 500)
@@ -136,5 +157,17 @@ const handleLogin = async () => {
 	font-size: 22rpx;
 	color: rgba(255, 255, 255, 0.6);
 	margin-top: 30rpx;
+}
+
+/* 夜间模式 */
+.dark-mode.login-page {
+	background: linear-gradient(180deg, #0d47a1 0%, #1a237e 50%, #121212 100%);
+}
+.dark-mode .login-btn {
+	background-color: #1e1e1e;
+	color: #5b9bf5;
+}
+.dark-mode .login-tip {
+	color: rgba(255, 255, 255, 0.4);
 }
 </style>

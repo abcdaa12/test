@@ -2,6 +2,8 @@
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const utils_auth = require("../../utils/auth.js");
+const utils_i18n = require("../../utils/i18n.js");
+const utils_theme = require("../../utils/theme.js");
 const _sfc_main = {
   __name: "login",
   setup(__props) {
@@ -20,7 +22,7 @@ const _sfc_main = {
       loading.value = true;
       try {
         const userInfo = await utils_auth.wxLogin();
-        common_vendor.index.showToast({ title: "登录成功", icon: "success" });
+        common_vendor.index.showToast({ title: utils_i18n.t("login.success"), icon: "success" });
         setTimeout(() => {
           if (!userInfo.nickname || userInfo.nickname === "宿舍成员") {
             common_vendor.index.redirectTo({ url: "/pages/profile-edit/profile-edit?first=1" });
@@ -37,8 +39,12 @@ const _sfc_main = {
     return (_ctx, _cache) => {
       return {
         a: common_assets._imports_0,
-        b: loading.value,
-        c: common_vendor.o(handleLogin)
+        b: common_vendor.t(common_vendor.unref(utils_i18n.t)("login.appDesc")),
+        c: common_vendor.t(common_vendor.unref(utils_i18n.t)("login.btn")),
+        d: loading.value,
+        e: common_vendor.o(handleLogin),
+        f: common_vendor.t(common_vendor.unref(utils_i18n.t)("login.agreement")),
+        g: common_vendor.n(common_vendor.unref(utils_theme.isDark) ? "dark-mode" : "")
       };
     };
   }

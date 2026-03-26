@@ -1,255 +1,263 @@
 <template>
-	<!-- 首页：宿舍信息、欢迎语、公告、待办事项 -->
-	<view class="page">
-		<view class="container">
-			<!-- 顶部通栏：宿舍号 -->
-			<view class="dorm-banner">
-				<text class="dorm-number">🏠 {{ dormNo }} 宿舍</text>
-			</view>
-
-			<!-- 欢迎区：动态显示当前用户昵称 -->
-			<view class="welcome-section">
-				<text class="welcome-text">{{ nickname }}，你好！✨</text>
-			</view>
-
-			<!-- 宿舍公告区 -->
-			<view class="notice-card">
-				<view class="section-header">
-					<text class="section-title">📢 宿舍公告</text>
+	<view :class="['page', isDark ? 'dark-mode' : '']">
+		<scroll-view scroll-y refresher-enabled :refresher-triggered="refreshing" @refresherrefresh="onRefresh" style="height: 100vh;">
+			<view class="container">
+				<view class="dorm-banner">
+					<text class="dorm-number">🏠 {{ dormNo }} {{ t('home.dorm') }}</text>
 				</view>
-				<view class="notice-content">
-					<!-- 占位符：公告内容，后续从接口获取 -->
-					<text class="notice-text">{{ announcement }}</text>
-				</view>
-			</view>
 
-			<!-- 待办事项区（仅显示未完成） -->
-			<view class="todo-card">
-				<view class="section-header">
-					<text class="section-title">📋 我的待办</text>
+				<view class="welcome-section">
+					<text class="welcome-text">{{ nickname }}，{{ t('home.hello') }}！✨</text>
 				</view>
-				<!-- 有待办时显示列表 -->
-				<view v-if="todoList.length > 0" class="todo-list">
-					<view
-						v-for="(item, index) in todoList"
-						:key="item._id || index"
-						class="todo-item todo-item-clickable"
-						@click="handleTodoClick(item)"
-					>
-						<text class="todo-status undone">[未完成]</text>
-						<text class="todo-text">{{ item.content }}</text>
-						<text class="todo-arrow">›</text>
+
+				<!-- 快捷入口卡片 -->
+				<view class="quick-actions">
+					<view class="action-card" @tap="goTo('/pages/fee/fee')">
+						<text class="action-icon">💰</text>
+						<text class="action-label">{{ t('home.fee') }}</text>
+					</view>
+					<view class="action-card" @tap="goTo('/pages/vote/vote')">
+						<text class="action-icon">🗳️</text>
+						<text class="action-label">{{ t('home.vote') }}</text>
+					</view>
+					<view class="action-card" @tap="goTo('/pages/schedule/schedule')">
+						<text class="action-icon">📅</text>
+						<text class="action-label">{{ t('home.schedule') }}</text>
+					</view>
+					<view class="action-card" @tap="goTo('/pages/members/members')">
+						<text class="action-icon">👥</text>
+						<text class="action-label">{{ t('home.members') }}</text>
 					</view>
 				</view>
-				<!-- 无待办时显示空状态 -->
-				<view v-else class="todo-empty">
-					<text>暂无待办事项🎉</text>
+
+				<view class="notice-card">
+					<view class="section-header">
+						<text class="section-title">📢 {{ t('home.notice') }}</text>
+					</view>
+					<view class="notice-content">
+						<text class="notice-text">{{ announcement }}</text>
+					</view>
+				</view>
+
+				<view class="todo-card">
+					<view class="section-header">
+						<text class="section-title">📋 {{ t('home.todo') }}</text>
+						<text class="add-todo-btn" @tap="showAddTodo = !showAddTodo">+ {{ t('home.addTodo') }}</text>
+					</view>
+
+					<!-- 添加待办表单 -->
+					<view v-if="showAddTodo" class="add-todo-form">
+						<input class="todo-input" v-model="newTodoText" :placeholder="t('home.todoPh')" @confirm="addTodo" />
+						<view class="todo-submit-btn" @tap="addTodo">
+							<text class="todo-submit-text">{{ t('home.todoAdd') }}</text>
+						</view>
+					</view>
+
+					<view v-if="todoList.length > 0" class="todo-list">
+						<view
+							v-for="(item, index) in todoList"
+							:key="item._id || index"
+							class="todo-item"
+						>
+							<view class="todo-left" @tap="doneTodo(item)">
+								<text class="todo-check">☐</text>
+								<text class="todo-text">{{ item.content }}</text>
+							</view>
+							<text class="todo-del" @tap="deleteTodo(item)">✕</text>
+						</view>
+					</view>
+					<view v-else class="todo-empty">
+						<text>{{ t('home.noTodo') }}🎉</text>
+					</view>
 				</view>
 			</view>
-		</view>
+		</scroll-view>
 	</view>
 </template>
 
 <script setup>
-/**
- * 首页
- * - 使用原生导航栏，通过 uni.setNavigationBarTitle 动态修改标题
- * - 顶部通栏展示宿舍号
- * - 欢迎区动态显示当前用户昵称
- * - 宿舍公告区展示最新公告
- * - 待办事项区展示个人待办列表
- */
-import { ref, onMounted } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
-import { get } from '../../utils/request.js'
+import { ref } from 'vue'
+import { onShow, onShareAppMessage } from '@dcloudio/uni-app'
+import { get, post, put, del } from '../../utils/request.js'
 import { isLoggedIn, getLocalUserInfo } from '../../utils/auth.js'
+import { t } from '../../utils/i18n.js'
+import { isDark, applyNavBarTheme } from '../../utils/theme.js'
 
-// 宿舍号（后续从接口/缓存获取）
-const dormNo = ref('5号楼306')
-
-// 当前用户昵称（从本地登录态读取，未登录时显示默认值）
-const nickname = ref('宿舍成员')
-
-// 宿舍公告内容（占位符，后续从接口获取）
-const announcement = ref('本周三卫生检查，请各位同学提前做好清洁工作。')
-
-// 待办事项列表（仅未完成）
+const dormNo = ref('')
+const nickname = ref('')
+const announcement = ref('')
 const todoList = ref([])
+const refreshing = ref(false)
+const showAddTodo = ref(false)
+const newTodoText = ref('')
 
-// 待办类型 -> 跳转页面路径映射
-const todoPageMap = {
-	vote: '/pages/vote/vote',
-	task: '/pages/schedule/schedule',
-	finance: '/pages/fee/fee'
-}
+const goTo = (url) => uni.navigateTo({ url })
 
-/**
- * 获取未完成待办列表
- */
+onShareAppMessage(() => {
+	return {
+		title: `${t('invite.shareCardTitle')} ${dormNo.value}`,
+		path: `/pages/login/login?dormNumber=${encodeURIComponent(dormNo.value)}`,
+		imageUrl: '/static/logo.png'
+	}
+})
+
 const fetchTodoList = async () => {
 	try {
 		const userId = uni.getStorageSync('userId')
-		// 有 userId 就带上，没有就不传（后端兼容处理）
 		const url = userId ? `/api/todo/list?userId=${userId}` : '/api/todo/list'
 		const res = await get(url)
+		if (res.code === 200) todoList.value = res.data || []
+	} catch (e) { console.error('获取待办列表失败', e) }
+}
+
+const addTodo = async () => {
+	const text = newTodoText.value.trim()
+	if (!text) return
+	try {
+		const res = await post('/api/todo/create', { content: text })
 		if (res.code === 200) {
-			todoList.value = res.data || []
+			newTodoText.value = ''
+			showAddTodo.value = false
+			fetchTodoList()
 		}
-	} catch (e) {
-		console.error('获取待办列表失败', e)
-	}
+	} catch (e) { console.error('创建待办失败', e) }
 }
 
-/**
- * 点击待办项，跳转到对应处理页面
- */
-const handleTodoClick = (item) => {
-	const path = todoPageMap[item.type]
-	if (!path) return
-	// 拼接跳转路径，带上关联ID
-	const url = item.relatedId ? `${path}?id=${item.relatedId}` : path
-	uni.navigateTo({
-		url,
-		fail: () => {
-			// tabBar 页面用 switchTab（不支持传参，降级处理）
-			uni.switchTab({ url: path })
+const doneTodo = async (item) => {
+	try {
+		const res = await put('/api/todo/done', { todoId: item._id })
+		if (res.code === 200) fetchTodoList()
+	} catch (e) { console.error(e) }
+}
+
+const deleteTodo = async (item) => {
+	try {
+		const res = await del('/api/todo/delete', { todoId: item._id })
+		if (res.code === 200) fetchTodoList()
+	} catch (e) { console.error(e) }
+}
+
+const fetchDormInfo = async () => {
+	try {
+		const userInfo = getLocalUserInfo()
+		if (!userInfo.dormId) return
+		const res = await get(`/api/dorm/info?dormId=${userInfo.dormId}`)
+		if (res.code === 200 && res.data) {
+			dormNo.value = res.data.dormNumber || ''
+			announcement.value = res.data.notice || t('home.noNotice')
 		}
+	} catch (e) { console.error('获取宿舍信息失败', e) }
+}
+
+const fetchUnreadCount = async () => {
+	try {
+		const userId = uni.getStorageSync('userId')
+		if (!userId) return
+		const res = await get(`/api/message/unread-count?userId=${userId}`)
+		if (res.code === 200 && res.data) {
+			const count = res.data.count || 0
+			if (count > 0) {
+				uni.setTabBarBadge({ index: 1, text: String(count > 99 ? '99+' : count) })
+			} else {
+				uni.removeTabBarBadge({ index: 1 })
+			}
+		}
+	} catch (e) { console.error(e) }
+}
+
+const onRefresh = async () => {
+	refreshing.value = true
+	await Promise.all([fetchDormInfo(), fetchTodoList(), fetchUnreadCount()])
+	refreshing.value = false
+}
+
+// 请求微信订阅消息授权
+const requestSubscribe = () => {
+	// #ifdef MP-WEIXIN
+	const tmplIds = [
+		'YOUR_DORM_ACTIVITY_TEMPLATE_ID',
+		'YOUR_DUTY_REMINDER_TEMPLATE_ID'
+	].filter(id => !id.startsWith('YOUR_'))
+	if (tmplIds.length === 0) return
+	uni.requestSubscribeMessage({
+		tmplIds,
+		success(res) { console.log('订阅授权结果:', res) },
+		fail(err) { console.log('订阅授权取消:', err) }
 	})
+	// #endif
 }
 
-/**
- * 页面显示时刷新数据（需先检查登录态）
- */
 onShow(() => {
+	applyNavBarTheme()
 	if (!isLoggedIn()) {
 		uni.redirectTo({ url: '/pages/login/login' })
 		return
 	}
 	const userInfo = getLocalUserInfo()
-	nickname.value = userInfo.nickname || '宿舍成员'
-
-	uni.setNavigationBarTitle({
-		title: `${dormNo.value} - 宿舍管理平台`
-	})
-	fetchTodoList()
-})
-
-onMounted(() => {
-	if (isLoggedIn()) {
-		fetchTodoList()
+	nickname.value = userInfo.nickname || t('mine.defaultSign')
+	if (!userInfo.dormId) {
+		uni.redirectTo({ url: '/pages/dorm-setup/dorm-setup' })
+		return
 	}
+	uni.setNavigationBarTitle({ title: `${dormNo.value || ''} - ${t('home.title')}` })
+	fetchDormInfo()
+	fetchTodoList()
+	fetchUnreadCount()
+	// 请求订阅消息授权（宿舍动态 + 值日提醒）
+	requestSubscribe()
 })
 </script>
 
 <style scoped>
-/* 页面容器 */
-.page {
-	min-height: 100vh;
-	background-color: #f5f5f5;
-}
+.page { min-height: 100vh; background-color: var(--bg-page); }
+.container { padding: 24rpx; }
+.dorm-banner { background-color: #E6F7FF; border-radius: 10px; padding: 20rpx 30rpx; margin-bottom: 24rpx; }
+.dark-mode .dorm-banner { background-color: #1a2a3a; }
+.dorm-number { font-size: 36rpx; font-weight: bold; color: var(--color-primary); }
+.welcome-section { margin-bottom: 24rpx; padding: 0 8rpx; }
+.welcome-text { font-size: 30rpx; color: var(--text-primary); }
 
-/* 内容区 */
-.container {
-	padding: 24rpx;
+/* 快捷入口 */
+.quick-actions { display: flex; gap: 16rpx; margin-bottom: 24rpx; }
+.action-card {
+	flex: 1; display: flex; flex-direction: column; align-items: center;
+	background-color: var(--bg-card); border-radius: 16rpx; padding: 24rpx 0;
+	border: 1rpx solid var(--border-color);
 }
+.action-card:active { background-color: var(--bg-hover); }
+.action-icon { font-size: 44rpx; margin-bottom: 8rpx; }
+.action-label { font-size: 24rpx; color: var(--text-primary); }
 
-/* 顶部宿舍号通栏 */
-.dorm-banner {
-	background-color: #E6F7FF;
-	border-radius: 10px;
-	padding: 20rpx 30rpx;
-	margin-bottom: 24rpx;
-}
-.dorm-number {
-	font-size: 36rpx;
-	font-weight: bold;
-	color: #1677FF;
-}
+.notice-card { background-color: var(--bg-card); border: 1rpx solid var(--border-color); border-radius: 16rpx; padding: 24rpx; margin-bottom: 24rpx; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16rpx; }
+.section-title { font-size: 30rpx; font-weight: bold; color: var(--text-primary); }
+.notice-text { font-size: 28rpx; color: var(--text-secondary); line-height: 1.6; }
+.todo-card { background-color: var(--bg-card); border: 1rpx solid var(--border-color); border-radius: 16rpx; padding: 24rpx; margin-bottom: 24rpx; }
 
-/* 欢迎区 */
-.welcome-section {
-	margin-bottom: 24rpx;
-	padding: 0 8rpx;
+/* 添加待办 */
+.add-todo-btn { font-size: 26rpx; color: var(--color-primary); }
+.add-todo-form { display: flex; gap: 12rpx; margin-bottom: 16rpx; }
+.todo-input {
+	flex: 1; height: 64rpx; border: 1rpx solid var(--border-color);
+	border-radius: 8rpx; padding: 0 16rpx; font-size: 26rpx;
+	color: var(--text-primary); background-color: var(--bg-input);
 }
-.welcome-text {
-	font-size: 30rpx;
-	color: #333;
+.todo-submit-btn {
+	background-color: var(--color-primary); border-radius: 8rpx;
+	padding: 0 24rpx; display: flex; align-items: center;
 }
+.todo-submit-text { color: #fff; font-size: 26rpx; }
 
-/* 公告卡片 */
-.notice-card {
-	background-color: #fff;
-	border: 1rpx solid #eeeeee;
-	border-radius: 16rpx;
-	padding: 24rpx;
-	margin-bottom: 24rpx;
-}
-.section-header {
-	margin-bottom: 16rpx;
-}
-.section-title {
-	font-size: 30rpx;
-	font-weight: bold;
-	color: #333;
-}
-.notice-text {
-	font-size: 28rpx;
-	color: #666;
-	line-height: 1.6;
-}
-
-/* 待办卡片 */
-.todo-card {
-	background-color: #fff;
-	border: 1rpx solid #eeeeee;
-	border-radius: 16rpx;
-	padding: 24rpx;
-	margin-bottom: 24rpx;
-}
-.todo-list {
-	margin-top: 8rpx;
-}
+.todo-list { margin-top: 8rpx; }
 .todo-item {
-	display: flex;
-	align-items: center;
-	padding: 18rpx 0;
-	border-bottom: 1rpx solid #f5f5f5;
+	display: flex; align-items: center; justify-content: space-between;
+	padding: 18rpx 0; border-bottom: 1rpx solid var(--border-light);
 }
-.todo-item-clickable {
-	cursor: pointer;
-}
-.todo-item-clickable:active {
-	background-color: #f0f0f0;
-}
-.todo-item:last-child {
-	border-bottom: none;
-}
-.todo-status {
-	font-size: 24rpx;
-	margin-right: 12rpx;
-	flex-shrink: 0;
-}
-.todo-status.undone {
-	color: #fa541c;
-}
-.todo-status.done {
-	color: #52c41a;
-}
-.todo-text {
-	font-size: 28rpx;
-	color: #333;
-	flex: 1;
-}
-.todo-arrow {
-	font-size: 32rpx;
-	color: #ccc;
-	margin-left: 12rpx;
-	flex-shrink: 0;
-}
-.todo-empty {
-	text-align: center;
-	padding: 40rpx 0;
-	color: #999;
-	font-size: 28rpx;
-}
+.todo-item:last-child { border-bottom: none; }
+.todo-left { display: flex; align-items: center; flex: 1; }
+.todo-left:active { opacity: 0.6; }
+.todo-check { font-size: 32rpx; margin-right: 12rpx; color: var(--color-primary); }
+.todo-text { font-size: 28rpx; color: var(--text-primary); flex: 1; }
+.todo-del { font-size: 28rpx; color: #ff4d4f; padding: 8rpx 16rpx; }
+.todo-empty { text-align: center; padding: 40rpx 0; color: var(--text-hint); font-size: 28rpx; }
 </style>

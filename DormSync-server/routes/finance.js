@@ -10,8 +10,7 @@ const { authMiddleware } = require('../middlewares/jwt')
 
 // 发起收款（需要鉴权）
 router.post('/create', authMiddleware, financeController.createFinance)
-
-// 查看财务记录（需要鉴权）
 router.get('/list', authMiddleware, financeController.getFinanceList)
+router.delete('/delete', authMiddleware, financeController.deleteFinance)
 
 module.exports = router

@@ -1,60 +1,63 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const utils_auth = require("../../utils/auth.js");
+const utils_i18n = require("../../utils/i18n.js");
+const utils_theme = require("../../utils/theme.js");
 const _sfc_main = {
   __name: "mine",
   setup(__props) {
     const loggedIn = common_vendor.ref(false);
-    const userInfo = common_vendor.reactive({
-      nickname: "宿舍成员",
-      avatarUrl: "",
-      signature: "",
-      phone: "",
-      className: ""
-    });
+    const userInfo = common_vendor.reactive({ nickname: "", avatarUrl: "", signature: "" });
     const loadUserInfo = () => {
       loggedIn.value = utils_auth.isLoggedIn();
       if (loggedIn.value) {
         const info = utils_auth.getLocalUserInfo();
-        userInfo.nickname = info.nickname || "宿舍成员";
+        userInfo.nickname = info.nickname || "";
         userInfo.avatarUrl = info.avatarUrl || "";
         userInfo.signature = info.signature || "";
-        userInfo.phone = info.phone || "";
-        userInfo.className = info.className || "";
       }
     };
     const handleLogin = async () => {
       try {
-        const info = await utils_auth.wxLogin();
+        await utils_auth.wxLogin();
         loadUserInfo();
-        common_vendor.index.showToast({ title: "登录成功", icon: "success" });
+        common_vendor.index.showToast({ title: utils_i18n.t("mine.loginSuccess"), icon: "success" });
       } catch (err) {
-        common_vendor.index.__f__("error", "at pages/mine/mine.vue:112", "手动登录失败：", err);
+        common_vendor.index.__f__("error", "at pages/mine/mine.vue:94", err);
       }
     };
-    const editProfile = () => {
-      common_vendor.index.navigateTo({ url: "/pages/profile-edit/profile-edit" });
+    const goProfile = () => {
+      if (loggedIn.value)
+        common_vendor.index.navigateTo({ url: "/pages/profile-edit/profile-edit" });
+    };
+    const goPage = (url) => common_vendor.index.navigateTo({ url });
+    const onTodo = () => {
+      common_vendor.index.showToast({ title: utils_i18n.t("mine.developing"), icon: "none" });
+    };
+    const toggleDarkMode = () => {
+      utils_theme.toggleDark();
+      common_vendor.index.showToast({ title: utils_theme.isDark.value ? utils_i18n.t("mine.darkOn") : utils_i18n.t("mine.darkOff"), icon: "none" });
     };
     const logout = () => {
       common_vendor.index.showModal({
-        title: "提示",
-        content: "确定要退出登录吗？",
+        title: utils_i18n.t("mine.tip"),
+        content: utils_i18n.t("mine.logoutConfirm"),
         success: (res) => {
           if (res.confirm) {
             utils_auth.clearAuth();
             loggedIn.value = false;
-            userInfo.nickname = "宿舍成员";
+            userInfo.nickname = "";
             userInfo.avatarUrl = "";
             userInfo.signature = "";
-            userInfo.phone = "";
-            userInfo.className = "";
-            common_vendor.index.showToast({ title: "已退出登录", icon: "none" });
+            common_vendor.index.showToast({ title: utils_i18n.t("mine.logoutDone"), icon: "none" });
           }
         }
       });
     };
     common_vendor.onShow(() => {
+      utils_theme.applyNavBarTheme();
       loadUserInfo();
+      common_vendor.index.setNavigationBarTitle({ title: utils_i18n.t("tab.mine") });
     });
     return (_ctx, _cache) => {
       return common_vendor.e({
@@ -62,16 +65,31 @@ const _sfc_main = {
       }, userInfo.avatarUrl ? {
         b: userInfo.avatarUrl
       } : {}, {
-        c: common_vendor.t(userInfo.nickname),
-        d: common_vendor.t(userInfo.signature || "这个人很懒，什么都没写~"),
+        c: common_vendor.t(userInfo.nickname || common_vendor.unref(utils_i18n.t)("mine.defaultSign")),
+        d: common_vendor.t(userInfo.signature || common_vendor.unref(utils_i18n.t)("mine.defaultSign")),
         e: !loggedIn.value
       }, !loggedIn.value ? {
-        f: common_vendor.o(handleLogin)
+        f: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.notLogged")),
+        g: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.wxLogin")),
+        h: common_vendor.o(handleLogin)
       } : {
-        g: common_vendor.t(userInfo.phone || "未设置"),
-        h: common_vendor.t(userInfo.className || "未设置"),
-        i: common_vendor.o(editProfile),
-        j: common_vendor.o(logout)
+        i: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.profile")),
+        j: common_vendor.o(goProfile),
+        k: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.systemSetting")),
+        l: common_vendor.o(($event) => onTodo()),
+        m: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.language")),
+        n: common_vendor.o(($event) => goPage("/pages/language/language")),
+        o: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.darkMode")),
+        p: common_vendor.unref(utils_theme.isDark),
+        q: common_vendor.o(toggleDarkMode),
+        r: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.about")),
+        s: common_vendor.o(($event) => onTodo()),
+        t: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.terms")),
+        v: common_vendor.o(($event) => onTodo()),
+        w: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.logout")),
+        x: common_vendor.o(logout)
+      }, {
+        y: common_vendor.n(common_vendor.unref(utils_theme.isDark) ? "dark-mode" : "")
       });
     };
   }

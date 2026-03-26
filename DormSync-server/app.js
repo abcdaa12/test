@@ -28,6 +28,7 @@ app.use('/api/message', require('./routes/message'))
 app.use('/api/decision', require('./routes/decision'))
 app.use('/api/task', require('./routes/task'))
 app.use('/api/finance', require('./routes/finance'))
+app.use('/api/schedule', require('./routes/schedule'))
 
 // 5. 健康检查接口
 app.get('/', (req, res) => {

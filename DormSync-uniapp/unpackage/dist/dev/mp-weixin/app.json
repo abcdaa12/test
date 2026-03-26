@@ -8,7 +8,8 @@
     "pages/fee/fee",
     "pages/vote/vote",
     "pages/schedule/schedule",
-    "pages/profile-edit/profile-edit"
+    "pages/profile-edit/profile-edit",
+    "pages/language/language"
   ],
   "window": {
     "navigationBarTextStyle": "white",

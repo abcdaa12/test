@@ -1,218 +1,173 @@
 <template>
-	<!-- 费用管理页：费用列表 + 发起新费用 -->
-	<view class="container">
-		<!-- 发起新费用按钮 -->
+	<view :class="['container', isDark ? 'dark-mode' : '']">
 		<button class="btn-primary" @tap="showForm = !showForm">
-			{{ showForm ? '收起表单' : '+ 发起新费用' }}
+			{{ showForm ? t('fee.hideForm') : '+ ' + t('fee.toggleForm') }}
 		</button>
 
-		<!-- 新费用表单 -->
 		<view v-if="showForm" class="card form-card">
-			<view class="form-title">发起新费用</view>
-			<input
-				class="input"
-				v-model="form.title"
-				placeholder="费用名称（如：电费）"
-			/>
-			<input
-				class="input"
-				v-model="form.amount"
-				type="digit"
-				placeholder="金额（元）"
-			/>
-			<input
-				class="input"
-				v-model="form.payer"
-				placeholder="付款人"
-			/>
-			<input
-				class="input"
-				v-model="form.remark"
-				placeholder="备注（选填）"
-			/>
-			<button class="btn-primary" @tap="submitFee">提交费用</button>
+			<view class="form-title">{{ t('fee.formTitle') }}</view>
+			<input class="input" v-model="form.title" :placeholder="t('fee.namePh')" />
+			<input class="input" v-model="form.amount" type="digit" :placeholder="t('fee.amountPh')" />
+			<picker :range="memberNames" @change="onPayerChange" :value="payerIndex">
+				<view class="input picker-input">
+					{{ payerIndex >= 0 ? memberNames[payerIndex] : t('fee.payerPh') }}
+				</view>
+			</picker>
+			<input class="input" v-model="form.remark" :placeholder="t('fee.remarkPh')" />
+			<button class="btn-primary" @tap="submitFee">{{ t('fee.submit') }}</button>
 		</view>
 
-		<!-- 费用列表 -->
-		<view class="section-title">费用记录</view>
-		<view v-if="feeList.length === 0" class="empty-tip">
-			<text>暂无费用记录</text>
-		</view>
-		<view v-for="(item, index) in feeList" :key="index" class="card fee-item">
-			<view class="fee-header">
-				<text class="fee-title">{{ item.title }}</text>
-				<text class="fee-amount">¥{{ item.amount }}</text>
+		<view class="section-title">{{ t('fee.record') }}</view>
+		<scroll-view scroll-y refresher-enabled :refresher-triggered="refreshing" @refresherrefresh="onRefresh" style="height: calc(100vh - 400rpx);">
+			<view v-if="feeList.length === 0" class="empty-tip">
+				<text>{{ t('fee.noRecord') }}</text>
 			</view>
-			<view class="fee-detail">
-				<text>付款人：{{ item.payer }}</text>
-				<text>人均：¥{{ item.perPerson }}</text>
+			<view v-for="(item, index) in feeList" :key="item._id || index" class="fee-item-wrap">
+				<view class="card fee-item" @touchstart="onTouchStart($event, index)" @touchmove="onTouchMove($event, index)" @touchend="onTouchEnd(index)" :style="{ transform: 'translateX(' + (item._offsetX || 0) + 'rpx)' }">
+					<view class="fee-header">
+						<text class="fee-title">{{ item.title }}</text>
+						<text class="fee-amount">¥{{ item.amount }}</text>
+					</view>
+					<view class="fee-detail">
+						<text>{{ t('fee.payer') }}：{{ item.creatorName || '' }}</text>
+						<text>{{ t('fee.perPerson') }}：¥{{ item.perPerson || '' }}</text>
+					</view>
+					<text class="fee-time">{{ formatTime(item.createdAt) }}</text>
+				</view>
+				<view class="fee-actions">
+					<view class="action-btn delete-btn" @tap="deleteFee(item)">
+						<text>{{ t('fee.delete') }}</text>
+					</view>
+				</view>
 			</view>
-			<text v-if="item.remark" class="fee-remark">备注：{{ item.remark }}</text>
-			<text class="fee-time">{{ item.createTime }}</text>
-		</view>
+		</scroll-view>
 	</view>
 </template>
 
 <script setup>
-/**
- * 费用管理页
- * - 展示费用列表
- * - 发起新费用（本地模拟 + 接口预留）
- */
-import { ref, reactive, onMounted } from 'vue'
-import { get, post } from '@/utils/request'
+import { ref, reactive, computed } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { get, post, del } from '@/utils/request'
+import { t } from '@/utils/i18n'
+import { isDark, applyNavBarTheme } from '@/utils/theme'
+import { getLocalUserInfo } from '@/utils/auth'
 
-// 控制表单显示
 const showForm = ref(false)
+const refreshing = ref(false)
+const members = ref([])
+const memberNames = computed(() => members.value.map(m => m.nickname))
+const payerIndex = ref(-1)
+const form = reactive({ title: '', amount: '', remark: '' })
+const feeList = ref([])
 
-// 宿舍人数（用于计算人均）
-const memberCount = 4
+const formatTime = (t) => t ? new Date(t).toISOString().slice(0, 10) : ''
+const onPayerChange = (e) => { payerIndex.value = Number(e.detail.value) }
 
-// 新费用表单数据
-const form = reactive({
-	title: '',
-	amount: '',
-	payer: '',
-	remark: ''
-})
-
-// 费用列表
-const feeList = ref([
-	{
-		title: '6月电费',
-		amount: '120.00',
-		payer: '张三',
-		perPerson: '30.00',
-		remark: '',
-		createTime: '2025-06-01'
-	},
-	{
-		title: '桶装水',
-		amount: '40.00',
-		payer: '李四',
-		perPerson: '10.00',
-		remark: '农夫山泉 5桶',
-		createTime: '2025-06-03'
-	}
-])
-
-/**
- * 提交新费用
- */
-const submitFee = async () => {
-	// 表单校验
-	if (!form.title || !form.amount || !form.payer) {
-		uni.showToast({ title: '请填写完整信息', icon: 'none' })
-		return
-	}
-
-	const amount = parseFloat(form.amount)
-	if (isNaN(amount) || amount <= 0) {
-		uni.showToast({ title: '请输入有效金额', icon: 'none' })
-		return
-	}
-
-	// 构造费用对象
-	const newFee = {
-		title: form.title,
-		amount: amount.toFixed(2),
-		payer: form.payer,
-		perPerson: (amount / memberCount).toFixed(2),
-		remark: form.remark,
-		createTime: new Date().toISOString().slice(0, 10)
-	}
-
-	// TODO: 调用后端接口
-	// await post('/api/fee', newFee)
-
-	// 本地添加到列表顶部
-	feeList.value.unshift(newFee)
-
-	// 重置表单
-	form.title = ''
-	form.amount = ''
-	form.payer = ''
-	form.remark = ''
-	showForm.value = false
-
-	uni.showToast({ title: '费用已添加', icon: 'success' })
+let startX = 0
+const onTouchStart = (e, index) => { startX = e.touches[0].clientX }
+const onTouchMove = (e, index) => {
+	const diff = e.touches[0].clientX - startX
+	feeList.value[index]._offsetX = diff < 0 ? Math.max(diff * 2, -160) : 0
+}
+const onTouchEnd = (index) => {
+	const item = feeList.value[index]
+	item._offsetX = (item._offsetX || 0) < -80 ? -160 : 0
 }
 
-/**
- * 页面加载时获取费用列表（预留接口）
- */
-onMounted(async () => {
+const fetchMembers = async () => {
 	try {
-		// TODO: 从后端获取费用列表
-		// const res = await get('/api/fee/list')
-		// feeList.value = res.data
-	} catch (e) {
-		console.log('获取费用列表失败', e)
+		const userInfo = getLocalUserInfo()
+		if (!userInfo.dormId) return
+		const res = await get(`/api/dorm/members?dormId=${userInfo.dormId}`)
+		if (res.code === 200) members.value = res.data || []
+	} catch (e) { console.error(e) }
+}
+
+const fetchList = async () => {
+	try {
+		const userInfo = getLocalUserInfo()
+		if (!userInfo.dormId) return
+		const res = await get(`/api/finance/list?dormId=${userInfo.dormId}`)
+		if (res.code === 200) {
+			feeList.value = (res.data || []).map(item => ({
+				...item, _offsetX: 0,
+				creatorName: item.creatorId?.nickname || '',
+				perPerson: members.value.length > 0 ? (item.amount / members.value.length).toFixed(2) : item.amount
+			}))
+		}
+	} catch (e) { console.error(e) }
+}
+
+const submitFee = async () => {
+	if (!form.title || !form.amount) {
+		uni.showToast({ title: t('fee.fillAll'), icon: 'none' }); return
 	}
+	const amount = parseFloat(form.amount)
+	if (isNaN(amount) || amount <= 0) {
+		uni.showToast({ title: t('fee.invalidAmount'), icon: 'none' }); return
+	}
+	if (payerIndex.value < 0) {
+		uni.showToast({ title: t('fee.payerPh'), icon: 'none' }); return
+	}
+	const userInfo = getLocalUserInfo()
+	try {
+		const res = await post('/api/finance/create', {
+			dormId: userInfo.dormId, title: form.title, amount,
+			creatorId: members.value[payerIndex.value]._id,
+			payeeIds: members.value.map(m => m._id)
+		})
+		if (res.code === 200) {
+			uni.showToast({ title: t('fee.added'), icon: 'success' })
+			form.title = ''; form.amount = ''; form.remark = ''; payerIndex.value = -1
+			showForm.value = false
+			fetchList()
+		} else {
+			uni.showToast({ title: res.msg || t('fee.fillAll'), icon: 'none' })
+		}
+	} catch (e) { uni.showToast({ title: t('fee.fillAll'), icon: 'none' }) }
+}
+
+const deleteFee = async (item) => {
+	uni.showModal({
+		title: t('fee.deleteTitle'),
+		content: t('fee.deleteConfirm'),
+		success: async (res) => {
+			if (!res.confirm) return
+			try {
+				const r = await del('/api/finance/delete', { financeId: item._id })
+				if (r.code === 200) {
+					uni.showToast({ title: t('fee.deleted'), icon: 'success' })
+					fetchList()
+				}
+			} catch (e) { console.error(e) }
+		}
+	})
+}
+
+const onRefresh = async () => { refreshing.value = true; await fetchList(); refreshing.value = false }
+
+onShow(() => {
+	applyNavBarTheme()
+	uni.setNavigationBarTitle({ title: t('fee.title') })
+	fetchMembers().then(() => fetchList())
 })
 </script>
 
 <style scoped>
-/* 表单区域 */
-.form-card {
-	margin-top: 24rpx;
-}
-.form-title {
-	font-size: 32rpx;
-	font-weight: bold;
-	margin-bottom: 24rpx;
-	color: #333;
-}
-
-/* 分区标题 */
-.section-title {
-	font-size: 30rpx;
-	font-weight: bold;
-	margin: 32rpx 0 16rpx;
-	color: #333;
-}
-
-/* 空状态提示 */
-.empty-tip {
-	text-align: center;
-	padding: 60rpx 0;
-	color: #ccc;
-	font-size: 28rpx;
-}
-
-/* 费用条目 */
-.fee-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 12rpx;
-}
-.fee-title {
-	font-size: 30rpx;
-	font-weight: bold;
-}
-.fee-amount {
-	font-size: 34rpx;
-	color: #e74c3c;
-	font-weight: bold;
-}
-.fee-detail {
-	display: flex;
-	justify-content: space-between;
-	font-size: 26rpx;
-	color: #666;
-	margin-bottom: 8rpx;
-}
-.fee-remark {
-	font-size: 24rpx;
-	color: #999;
-	display: block;
-	margin-bottom: 8rpx;
-}
-.fee-time {
-	font-size: 22rpx;
-	color: #bbb;
-	display: block;
-	text-align: right;
-}
+.container { min-height: 100vh; background-color: var(--bg-page); padding: 24rpx; }
+.form-card { margin-top: 24rpx; }
+.form-title { font-size: 32rpx; font-weight: bold; margin-bottom: 24rpx; color: var(--text-primary); }
+.picker-input { color: var(--text-secondary); }
+.section-title { font-size: 30rpx; font-weight: bold; margin: 32rpx 0 16rpx; color: var(--text-primary); }
+.empty-tip { text-align: center; padding: 60rpx 0; color: var(--text-placeholder); font-size: 28rpx; }
+.fee-item-wrap { position: relative; overflow: hidden; margin-bottom: 16rpx; border-radius: 12rpx; }
+.fee-item { position: relative; z-index: 2; transition: transform 0.15s ease; }
+.fee-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12rpx; }
+.fee-title { font-size: 30rpx; font-weight: bold; color: var(--text-primary); }
+.fee-amount { font-size: 34rpx; color: #e74c3c; font-weight: bold; }
+.fee-detail { display: flex; justify-content: space-between; font-size: 26rpx; color: var(--text-secondary); margin-bottom: 8rpx; }
+.fee-time { font-size: 22rpx; color: var(--text-placeholder); display: block; text-align: right; }
+.fee-actions { position: absolute; right: 0; top: 0; bottom: 0; display: flex; z-index: 1; }
+.action-btn { display: flex; align-items: center; justify-content: center; width: 160rpx; color: #fff; font-size: 24rpx; }
+.delete-btn { background-color: #ff4d4f; border-radius: 0 12rpx 12rpx 0; }
 </style>

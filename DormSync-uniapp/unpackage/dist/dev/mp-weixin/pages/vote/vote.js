@@ -1,5 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_i18n = require("../../utils/i18n.js");
+const utils_theme = require("../../utils/theme.js");
 const _sfc_main = {
   __name: "vote",
   setup(__props) {
@@ -31,7 +33,7 @@ const _sfc_main = {
     ]);
     const addOption = () => {
       if (form.options.length >= 6) {
-        common_vendor.index.showToast({ title: "最多6个选项", icon: "none" });
+        common_vendor.index.showToast({ title: utils_i18n.t("vote.maxOption"), icon: "none" });
         return;
       }
       form.options.push("");
@@ -48,20 +50,20 @@ const _sfc_main = {
     const doVote = (voteIndex, optIndex) => {
       const vote = voteList.value[voteIndex];
       if (vote.status !== "active") {
-        common_vendor.index.showToast({ title: "投票已结束", icon: "none" });
+        common_vendor.index.showToast({ title: utils_i18n.t("vote.voteEnded"), icon: "none" });
         return;
       }
       vote.options[optIndex].count++;
-      common_vendor.index.showToast({ title: "投票成功", icon: "success" });
+      common_vendor.index.showToast({ title: utils_i18n.t("vote.voteSuccess"), icon: "success" });
     };
     const submitVote = async () => {
       if (!form.title) {
-        common_vendor.index.showToast({ title: "请输入投票主题", icon: "none" });
+        common_vendor.index.showToast({ title: utils_i18n.t("vote.topicRequired"), icon: "none" });
         return;
       }
       const validOptions = form.options.filter((o) => o.trim() !== "");
       if (validOptions.length < 2) {
-        common_vendor.index.showToast({ title: "至少需要2个有效选项", icon: "none" });
+        common_vendor.index.showToast({ title: utils_i18n.t("vote.minOption"), icon: "none" });
         return;
       }
       const newVote = {
@@ -74,21 +76,27 @@ const _sfc_main = {
       form.title = "";
       form.options = ["", ""];
       showForm.value = false;
-      common_vendor.index.showToast({ title: "投票已发起", icon: "success" });
+      common_vendor.index.showToast({ title: utils_i18n.t("vote.created"), icon: "success" });
     };
+    common_vendor.onShow(() => {
+      utils_theme.applyNavBarTheme();
+      common_vendor.index.setNavigationBarTitle({ title: utils_i18n.t("vote.title") });
+    });
     common_vendor.onMounted(async () => {
     });
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.t(showForm.value ? "收起表单" : "+ 发起新投票"),
+        a: common_vendor.t(showForm.value ? common_vendor.unref(utils_i18n.t)("vote.hideForm") : "+ " + common_vendor.unref(utils_i18n.t)("vote.toggleForm")),
         b: common_vendor.o(($event) => showForm.value = !showForm.value),
         c: showForm.value
       }, showForm.value ? {
-        d: form.title,
-        e: common_vendor.o(($event) => form.title = $event.detail.value),
-        f: common_vendor.f(form.options, (opt, idx, i0) => {
+        d: common_vendor.t(common_vendor.unref(utils_i18n.t)("vote.formTitle")),
+        e: common_vendor.unref(utils_i18n.t)("vote.topicPh"),
+        f: form.title,
+        g: common_vendor.o(($event) => form.title = $event.detail.value),
+        h: common_vendor.f(form.options, (opt, idx, i0) => {
           return common_vendor.e({
-            a: "选项 " + (idx + 1),
+            a: common_vendor.unref(utils_i18n.t)("vote.optionPh") + " " + (idx + 1),
             b: form.options[idx],
             c: common_vendor.o(($event) => form.options[idx] = $event.detail.value, idx)
           }, form.options.length > 2 ? {
@@ -97,16 +105,21 @@ const _sfc_main = {
             e: idx
           });
         }),
-        g: form.options.length > 2,
-        h: common_vendor.o(addOption),
-        i: common_vendor.o(submitVote)
+        i: form.options.length > 2,
+        j: common_vendor.t(common_vendor.unref(utils_i18n.t)("vote.addOption")),
+        k: common_vendor.o(addOption),
+        l: common_vendor.t(common_vendor.unref(utils_i18n.t)("vote.submit")),
+        m: common_vendor.o(submitVote)
       } : {}, {
-        j: voteList.value.length === 0
-      }, voteList.value.length === 0 ? {} : {}, {
-        k: common_vendor.f(voteList.value, (vote, index, i0) => {
+        n: common_vendor.t(common_vendor.unref(utils_i18n.t)("vote.list")),
+        o: voteList.value.length === 0
+      }, voteList.value.length === 0 ? {
+        p: common_vendor.t(common_vendor.unref(utils_i18n.t)("vote.noVote"))
+      } : {}, {
+        q: common_vendor.f(voteList.value, (vote, index, i0) => {
           return {
             a: common_vendor.t(vote.title),
-            b: common_vendor.t(vote.status === "active" ? "进行中" : "已结束"),
+            b: common_vendor.t(vote.status === "active" ? common_vendor.unref(utils_i18n.t)("vote.active") : common_vendor.unref(utils_i18n.t)("vote.ended")),
             c: common_vendor.n(vote.status === "active" ? "active" : "ended"),
             d: common_vendor.f(vote.options, (opt, oi, i1) => {
               return {
@@ -121,7 +134,9 @@ const _sfc_main = {
             e: common_vendor.t(vote.createTime),
             f: index
           };
-        })
+        }),
+        r: common_vendor.t(common_vendor.unref(utils_i18n.t)("vote.ticket")),
+        s: common_vendor.n(common_vendor.unref(utils_theme.isDark) ? "dark-mode" : "")
       });
     };
   }

@@ -11,6 +11,9 @@ const { authMiddleware } = require('../middlewares/jwt')
 // 发起决策（需要鉴权）
 router.post('/create', authMiddleware, decisionController.createDecision)
 
+// 投票（需要鉴权）
+router.post('/vote', authMiddleware, decisionController.castVote)
+
 // 查看宿舍所有决策（需要鉴权）
 router.get('/list', authMiddleware, decisionController.getDecisionList)
 

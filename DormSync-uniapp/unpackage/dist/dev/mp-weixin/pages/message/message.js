@@ -1,5 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_i18n = require("../../utils/i18n.js");
+const utils_theme = require("../../utils/theme.js");
 const _sfc_main = {
   __name: "message",
   setup(__props) {
@@ -7,17 +9,17 @@ const _sfc_main = {
     const showFilter = common_vendor.ref(false);
     const filterStatus = common_vendor.ref("all");
     const filterType = common_vendor.ref("all");
-    const statusOptions = [
-      { label: "全部", value: "all" },
-      { label: "未读", value: "unread" },
-      { label: "已读", value: "read" }
-    ];
-    const typeOptions = [
-      { label: "全部", value: "all" },
-      { label: "投票", value: "vote" },
-      { label: "事务", value: "task" },
-      { label: "财务", value: "finance" }
-    ];
+    const statusOptions = common_vendor.computed(() => [
+      { label: utils_i18n.t("message.all"), value: "all" },
+      { label: utils_i18n.t("message.unread"), value: "unread" },
+      { label: utils_i18n.t("message.read"), value: "read" }
+    ]);
+    const typeOptions = common_vendor.computed(() => [
+      { label: utils_i18n.t("message.all"), value: "all" },
+      { label: utils_i18n.t("message.voteType"), value: "vote" },
+      { label: utils_i18n.t("message.taskType"), value: "task" },
+      { label: utils_i18n.t("message.financeType"), value: "finance" }
+    ]);
     const messageList = common_vendor.ref([
       { read: false, type: "vote", typeLabel: "投票", content: "投票通知：请参与宿舍长选举", time: "2026-02-11" },
       { read: false, type: "task", typeLabel: "事务", content: "值日提醒：明天轮到你值日", time: "2026-02-11" },
@@ -59,7 +61,7 @@ const _sfc_main = {
     const markRead = (index) => {
       filteredMessages.value[index].read = true;
       filteredMessages.value[index]._offsetX = 0;
-      common_vendor.index.showToast({ title: "已标记为已读", icon: "none" });
+      common_vendor.index.showToast({ title: utils_i18n.t("message.markedRead"), icon: "none" });
     };
     const deleteMsg = (index) => {
       const msg = filteredMessages.value[index];
@@ -67,16 +69,23 @@ const _sfc_main = {
       if (realIndex > -1) {
         messageList.value.splice(realIndex, 1);
       }
-      common_vendor.index.showToast({ title: "已删除", icon: "none" });
+      common_vendor.index.showToast({ title: utils_i18n.t("message.deleted"), icon: "none" });
     };
+    common_vendor.onShow(() => {
+      utils_theme.applyNavBarTheme();
+      common_vendor.index.setNavigationBarTitle({ title: utils_i18n.t("message.title") });
+    });
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: searchText.value,
-        b: common_vendor.o(($event) => searchText.value = $event.detail.value),
-        c: common_vendor.o(($event) => showFilter.value = true),
-        d: showFilter.value
+        a: common_vendor.unref(utils_i18n.t)("message.search"),
+        b: searchText.value,
+        c: common_vendor.o(($event) => searchText.value = $event.detail.value),
+        d: common_vendor.t(common_vendor.unref(utils_i18n.t)("message.filter")),
+        e: common_vendor.o(($event) => showFilter.value = true),
+        f: showFilter.value
       }, showFilter.value ? {
-        e: common_vendor.f(statusOptions, (s, k0, i0) => {
+        g: common_vendor.t(common_vendor.unref(utils_i18n.t)("message.byStatus")),
+        h: common_vendor.f(statusOptions.value, (s, k0, i0) => {
           return {
             a: common_vendor.t(s.label),
             b: s.value,
@@ -84,24 +93,28 @@ const _sfc_main = {
             d: common_vendor.o(($event) => filterStatus.value = s.value, s.value)
           };
         }),
-        f: common_vendor.f(typeOptions, (t, k0, i0) => {
+        i: common_vendor.t(common_vendor.unref(utils_i18n.t)("message.byType")),
+        j: common_vendor.f(typeOptions.value, (t2, k0, i0) => {
           return {
-            a: common_vendor.t(t.label),
-            b: t.value,
-            c: common_vendor.n(filterType.value === t.value ? "active" : ""),
-            d: common_vendor.o(($event) => filterType.value = t.value, t.value)
+            a: common_vendor.t(t2.label),
+            b: t2.value,
+            c: common_vendor.n(filterType.value === t2.value ? "active" : ""),
+            d: common_vendor.o(($event) => filterType.value = t2.value, t2.value)
           };
         }),
-        g: common_vendor.o(($event) => showFilter.value = false),
-        h: common_vendor.o(() => {
+        k: common_vendor.t(common_vendor.unref(utils_i18n.t)("message.confirm")),
+        l: common_vendor.o(($event) => showFilter.value = false),
+        m: common_vendor.o(() => {
         }),
-        i: common_vendor.o(($event) => showFilter.value = false)
+        n: common_vendor.o(($event) => showFilter.value = false)
       } : {}, {
-        j: filteredMessages.value.length === 0
-      }, filteredMessages.value.length === 0 ? {} : {}, {
-        k: common_vendor.f(filteredMessages.value, (msg, index, i0) => {
+        o: filteredMessages.value.length === 0
+      }, filteredMessages.value.length === 0 ? {
+        p: common_vendor.t(common_vendor.unref(utils_i18n.t)("message.noMessage"))
+      } : {}, {
+        q: common_vendor.f(filteredMessages.value, (msg, index, i0) => {
           return {
-            a: common_vendor.t(msg.read ? "[已读]" : "[未读]"),
+            a: common_vendor.t(msg.read ? "[" + common_vendor.unref(utils_i18n.t)("message.readTag") + "]" : "[" + common_vendor.unref(utils_i18n.t)("message.unreadTag") + "]"),
             b: common_vendor.n(msg.read ? "read" : "unread"),
             c: common_vendor.t(msg.typeLabel),
             d: common_vendor.n("type-" + msg.type),
@@ -115,7 +128,10 @@ const _sfc_main = {
             l: common_vendor.o(($event) => deleteMsg(index), index),
             m: index
           };
-        })
+        }),
+        r: common_vendor.t(common_vendor.unref(utils_i18n.t)("message.markRead")),
+        s: common_vendor.t(common_vendor.unref(utils_i18n.t)("message.delete")),
+        t: common_vendor.n(common_vendor.unref(utils_theme.isDark) ? "dark-mode" : "")
       });
     };
   }

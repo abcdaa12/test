@@ -1,14 +1,24 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_i18n = require("../../utils/i18n.js");
+const utils_theme = require("../../utils/theme.js");
 const _sfc_main = {
   __name: "schedule",
   setup(__props) {
     const members = common_vendor.ref(["张三", "李四", "王五", "赵六"]);
-    const cycleOptions = ["按周排班", "按天轮换"];
+    const cycleOptions = common_vendor.computed(() => [utils_i18n.t("schedule.weekly"), utils_i18n.t("schedule.daily")]);
     const cycleIndex = common_vendor.ref(0);
     const scheduleList = common_vendor.ref([]);
     const historyList = common_vendor.ref([]);
-    const weekdayMap = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+    const weekdayMap = common_vendor.computed(() => [
+      utils_i18n.t("schedule.sun"),
+      utils_i18n.t("schedule.mon"),
+      utils_i18n.t("schedule.tue"),
+      utils_i18n.t("schedule.wed"),
+      utils_i18n.t("schedule.thu"),
+      utils_i18n.t("schedule.fri"),
+      utils_i18n.t("schedule.sat")
+    ]);
     const currentWeekLabel = common_vendor.computed(() => {
       const now = /* @__PURE__ */ new Date();
       const monday = new Date(now);
@@ -41,7 +51,7 @@ const _sfc_main = {
         d.setDate(monday.getDate() + i);
         list.push({
           date: formatFullDate(d),
-          weekday: weekdayMap[d.getDay()],
+          weekday: weekdayMap.value[d.getDay()],
           person: members.value[i % members.value.length]
         });
       }
@@ -52,22 +62,33 @@ const _sfc_main = {
         });
       }
       scheduleList.value = list;
-      common_vendor.index.showToast({ title: "排班已生成", icon: "success" });
+      common_vendor.index.showToast({ title: utils_i18n.t("schedule.generated"), icon: "success" });
     };
+    common_vendor.onShow(() => {
+      utils_theme.applyNavBarTheme();
+      common_vendor.index.setNavigationBarTitle({ title: utils_i18n.t("schedule.title") });
+    });
     common_vendor.onMounted(async () => {
     });
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.t(cycleOptions[cycleIndex.value]),
-        b: cycleOptions,
-        c: common_vendor.o(onCycleChange),
-        d: cycleIndex.value,
-        e: common_vendor.t(members.value.join("、")),
-        f: common_vendor.o(generateSchedule),
-        g: common_vendor.t(currentWeekLabel.value),
-        h: scheduleList.value.length === 0
-      }, scheduleList.value.length === 0 ? {} : {}, {
-        i: common_vendor.f(scheduleList.value, (item, index, i0) => {
+        a: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.setting")),
+        b: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.cycle")),
+        c: common_vendor.t(cycleOptions.value[cycleIndex.value]),
+        d: cycleOptions.value,
+        e: common_vendor.o(onCycleChange),
+        f: cycleIndex.value,
+        g: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.members")),
+        h: common_vendor.t(members.value.join("、")),
+        i: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.generate")),
+        j: common_vendor.o(generateSchedule),
+        k: common_vendor.t(currentWeekLabel.value),
+        l: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.table")),
+        m: scheduleList.value.length === 0
+      }, scheduleList.value.length === 0 ? {
+        n: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.noSchedule"))
+      } : {}, {
+        o: common_vendor.f(scheduleList.value, (item, index, i0) => {
           return {
             a: common_vendor.t(item.date),
             b: common_vendor.t(item.weekday),
@@ -75,9 +96,10 @@ const _sfc_main = {
             d: index
           };
         }),
-        j: historyList.value.length > 0
+        p: historyList.value.length > 0
       }, historyList.value.length > 0 ? {
-        k: common_vendor.f(historyList.value, (week, wi, i0) => {
+        q: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.history")),
+        r: common_vendor.f(historyList.value, (week, wi, i0) => {
           return {
             a: common_vendor.t(week.label),
             b: common_vendor.f(week.items, (item, si, i1) => {
@@ -91,7 +113,9 @@ const _sfc_main = {
             c: wi
           };
         })
-      } : {});
+      } : {}, {
+        s: common_vendor.n(common_vendor.unref(utils_theme.isDark) ? "dark-mode" : "")
+      });
     };
   }
 };

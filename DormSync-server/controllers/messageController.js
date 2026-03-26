@@ -81,3 +81,60 @@ exports.searchMessage = async (req, res, next) => {
         next(err)
     }
 }
+
+/**
+ * 删除消息
+ * DELETE /api/message/delete
+ * Body: { messageId }
+ */
+exports.deleteMessage = async (req, res, next) => {
+    try {
+        const { messageId } = req.body
+        if (!messageId) {
+            return res.json({ code: 400, msg: '缺少参数 messageId', data: null })
+        }
+
+        const message = await Message.findByIdAndDelete(messageId)
+        if (!message) {
+            return res.json({ code: 404, msg: '消息不存在', data: null })
+        }
+
+        res.json({ code: 200, msg: '删除成功', data: null })
+    } catch (err) {
+        next(err)
+    }
+}
+
+/**
+ * 批量创建消息（内部调用，给宿舍成员发通知）
+ */
+exports.createNotification = async ({ userIds, type, content }) => {
+    try {
+        const messages = userIds.map(userId => ({
+            userId,
+            type,
+            content,
+            status: 'unread'
+        }))
+        await Message.insertMany(messages)
+    } catch (err) {
+        console.error('创建通知失败', err)
+    }
+}
+
+/**
+ * 获取未读消息数量
+ * GET /api/message/unread-count
+ */
+exports.getUnreadCount = async (req, res, next) => {
+    try {
+        const userId = req.userId || req.query.userId
+        if (!userId) {
+            return res.json({ code: 400, msg: '缺少参数 userId', data: null })
+        }
+        const count = await Message.countDocuments({ userId, status: 'unread' })
+        res.json({ code: 200, msg: '查询成功', data: { count } })
+    } catch (err) {
+        next(err)
+    }
+}

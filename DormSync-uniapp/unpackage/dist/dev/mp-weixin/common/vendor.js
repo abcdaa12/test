@@ -7930,4 +7930,5 @@ exports.onShow = onShow;
 exports.reactive = reactive;
 exports.ref = ref;
 exports.t = t;
+exports.unref = unref;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/vendor.js.map

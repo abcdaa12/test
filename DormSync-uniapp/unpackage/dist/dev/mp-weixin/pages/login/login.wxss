@@ -61,3 +61,15 @@
 	color: rgba(255, 255, 255, 0.6);
 	margin-top: 30rpx;
 }
+
+/* 夜间模式 */
+.dark-mode.login-page.data-v-e4e4508d {
+	background: linear-gradient(180deg, #0d47a1 0%, #1a237e 50%, #121212 100%);
+}
+.dark-mode .login-btn.data-v-e4e4508d {
+	background-color: #1e1e1e;
+	color: #5b9bf5;
+}
+.dark-mode .login-tip.data-v-e4e4508d {
+	color: rgba(255, 255, 255, 0.4);
+}

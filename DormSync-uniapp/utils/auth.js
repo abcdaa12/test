@@ -65,7 +65,9 @@ export const wxLogin = () => {
                             avatarServer: userInfo.avatar || '',
                             phone: userInfo.phone || '',
                             className: userInfo.class || '',
-                            signature: userInfo.signature || ''
+                            signature: userInfo.signature || '',
+                            dormId: userInfo.dormId || '',
+                            role: userInfo.role || 'member'
                         }
 
                         uni.setStorageSync('token', token)

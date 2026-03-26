@@ -2,11 +2,13 @@
 const common_vendor = require("../../common/vendor.js");
 const utils_request = require("../../utils/request.js");
 const utils_auth = require("../../utils/auth.js");
+const utils_i18n = require("../../utils/i18n.js");
+const utils_theme = require("../../utils/theme.js");
 const _sfc_main = {
   __name: "index",
   setup(__props) {
     const dormNo = common_vendor.ref("5号楼306");
-    const nickname = common_vendor.ref("宿舍成员");
+    const nickname = common_vendor.ref("");
     const announcement = common_vendor.ref("本周三卫生检查，请各位同学提前做好清洁工作。");
     const todoList = common_vendor.ref([]);
     const todoPageMap = {
@@ -23,7 +25,7 @@ const _sfc_main = {
           todoList.value = res.data || [];
         }
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/index/index.vue:99", "获取待办列表失败", e);
+        common_vendor.index.__f__("error", "at pages/index/index.vue:93", "获取待办列表失败", e);
       }
     };
     const handleTodoClick = (item) => {
@@ -39,14 +41,15 @@ const _sfc_main = {
       });
     };
     common_vendor.onShow(() => {
+      utils_theme.applyNavBarTheme();
       if (!utils_auth.isLoggedIn()) {
         common_vendor.index.redirectTo({ url: "/pages/login/login" });
         return;
       }
       const userInfo = utils_auth.getLocalUserInfo();
-      nickname.value = userInfo.nickname || "宿舍成员";
+      nickname.value = userInfo.nickname || utils_i18n.t("mine.defaultSign");
       common_vendor.index.setNavigationBarTitle({
-        title: `${dormNo.value} - 宿舍管理平台`
+        title: `${dormNo.value} - ${utils_i18n.t("home.title")}`
       });
       fetchTodoList();
     });
@@ -58,18 +61,27 @@ const _sfc_main = {
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: common_vendor.t(dormNo.value),
-        b: common_vendor.t(nickname.value),
-        c: common_vendor.t(announcement.value),
-        d: todoList.value.length > 0
+        b: common_vendor.t(common_vendor.unref(utils_i18n.t)("home.dorm")),
+        c: common_vendor.t(nickname.value),
+        d: common_vendor.t(common_vendor.unref(utils_i18n.t)("home.hello")),
+        e: common_vendor.t(common_vendor.unref(utils_i18n.t)("home.notice")),
+        f: common_vendor.t(announcement.value),
+        g: common_vendor.t(common_vendor.unref(utils_i18n.t)("home.todo")),
+        h: todoList.value.length > 0
       }, todoList.value.length > 0 ? {
-        e: common_vendor.f(todoList.value, (item, index, i0) => {
+        i: common_vendor.f(todoList.value, (item, index, i0) => {
           return {
             a: common_vendor.t(item.content),
             b: item._id || index,
             c: common_vendor.o(($event) => handleTodoClick(item), item._id || index)
           };
-        })
-      } : {});
+        }),
+        j: common_vendor.t(common_vendor.unref(utils_i18n.t)("home.undone"))
+      } : {
+        k: common_vendor.t(common_vendor.unref(utils_i18n.t)("home.noTodo"))
+      }, {
+        l: common_vendor.n(common_vendor.unref(utils_theme.isDark) ? "dark-mode" : "")
+      });
     };
   }
 };
