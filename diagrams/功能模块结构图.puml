@@ -1,0 +1,53 @@
+@startuml
+skinparam rectangle {
+  RoundCorner 5
+  FontSize 12
+}
+skinparam defaultFontSize 12
+
+rectangle "DormSync 宿舍协同管理系统" as root #E3F2FD {
+
+  rectangle "微信登录" as m1 #FFFFFF
+  rectangle "个人信息管理" as m2 #FFFFFF
+  rectangle "宿舍管理" as m3 #FFFFFF {
+    rectangle "创建宿舍" as m3a #F5F5F5
+    rectangle "加入宿舍" as m3b #F5F5F5
+    rectangle "离开宿舍" as m3c #F5F5F5
+  }
+  rectangle "待办事项" as m4 #FFFFFF
+  rectangle "费用管理" as m5 #FFFFFF {
+    rectangle "发起收款" as m5a #F5F5F5
+    rectangle "费用统计" as m5b #F5F5F5
+    rectangle "搜索筛选" as m5c #F5F5F5
+  }
+  rectangle "投票决策" as m6 #FFFFFF {
+    rectangle "发起投票" as m6a #F5F5F5
+    rectangle "参与投票" as m6b #F5F5F5
+    rectangle "匿名投票" as m6c #F5F5F5
+  }
+  rectangle "排班管理" as m7 #FFFFFF {
+    rectangle "手动排班" as m7a #F5F5F5
+    rectangle "AI智能排班" as m7b #F5F5F5
+    rectangle "历史排班" as m7c #F5F5F5
+  }
+  rectangle "公告管理" as m8 #FFFFFF {
+    rectangle "发布公告" as m8a #F5F5F5
+    rectangle "已读追踪" as m8b #F5F5F5
+  }
+  rectangle "消息通知" as m9 #FFFFFF {
+    rectangle "消息筛选" as m9a #F5F5F5
+    rectangle "全部已读" as m9b #F5F5F5
+    rectangle "未读角标" as m9c #F5F5F5
+  }
+  rectangle "成员管理" as m10 #FFFFFF {
+    rectangle "成员列表" as m10a #F5F5F5
+    rectangle "宿舍长选举" as m10b #F5F5F5
+    rectangle "邀请成员" as m10c #F5F5F5
+  }
+  rectangle "系统设置" as m11 #FFFFFF {
+    rectangle "语言切换\n(中/英/韩/日)" as m11a #F5F5F5
+    rectangle "夜间模式" as m11b #F5F5F5
+  }
+}
+
+@enduml

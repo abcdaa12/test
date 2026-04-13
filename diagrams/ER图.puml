@@ -1,0 +1,124 @@
+@startuml
+skinparam linetype ortho
+skinparam entity {
+  BackgroundColor #FFFDE7
+  BorderColor #333333
+  FontSize 13
+}
+
+entity "用户 User" as User {
+  * _id : ObjectId
+  --
+  openid : String
+  nickname : String
+  avatar : String
+  signature : String
+  phone : String
+  class : String
+  dormId : ObjectId
+  role : String
+  createdAt : Date
+}
+
+entity "宿舍 Dorm" as Dorm {
+  * _id : ObjectId
+  --
+  dormNumber : String
+  notice : String
+  members : ObjectId[]
+  creator : ObjectId
+  createdAt : Date
+}
+
+entity "财务记录 Finance" as Finance {
+  * _id : ObjectId
+  --
+  dormId : ObjectId
+  title : String
+  amount : Number
+  creatorId : ObjectId
+  payeeIds : ObjectId[]
+  status : String
+  createdAt : Date
+}
+
+entity "投票决策 Decision" as Decision {
+  * _id : ObjectId
+  --
+  dormId : ObjectId
+  title : String
+  options : Array
+  voters : Array
+  deadline : Date
+  creatorId : ObjectId
+  status : String
+  anonymous : Boolean
+  createdAt : Date
+}
+
+entity "排班 Schedule" as Schedule {
+  * _id : ObjectId
+  --
+  dormId : ObjectId
+  weekLabel : String
+  cycle : String
+  items : Array
+  createdAt : Date
+}
+
+entity "消息 Message" as Message {
+  * _id : ObjectId
+  --
+  userId : ObjectId
+  type : String
+  content : String
+  status : String
+  createTime : Date
+}
+
+entity "待办事项 Todo" as Todo {
+  * _id : ObjectId
+  --
+  userId : ObjectId
+  type : String
+  relatedId : ObjectId
+  content : String
+  status : String
+  createTime : Date
+}
+
+entity "事务 Task" as Task {
+  * _id : ObjectId
+  --
+  dormId : ObjectId
+  title : String
+  content : String
+  assigneeId : ObjectId
+  deadline : Date
+  status : String
+  createdAt : Date
+}
+
+entity "公告 Announce" as Announce {
+  * _id : ObjectId
+  --
+  dormId : ObjectId
+  title : String
+  content : String
+  creatorId : ObjectId
+  readBy : ObjectId[]
+  createdAt : Date
+}
+
+Dorm ||--o{ User : "包含"
+Dorm ||--o{ Finance : "产生"
+Dorm ||--o{ Decision : "发起"
+Dorm ||--o{ Schedule : "安排"
+Dorm ||--o{ Task : "分配"
+Dorm ||--o{ Announce : "发布"
+User ||--o{ Todo : "创建"
+User ||--o{ Message : "接收"
+User ||--o{ Finance : "发起"
+User ||--o{ Decision : "创建"
+
+@enduml

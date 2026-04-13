@@ -138,3 +138,20 @@ exports.getUnreadCount = async (req, res, next) => {
         next(err)
     }
 }
+
+/**
+ * 全部标记已读
+ * PUT /api/message/read-all
+ */
+exports.markAllRead = async (req, res, next) => {
+    try {
+        const userId = req.userId || req.body.userId
+        if (!userId) {
+            return res.json({ code: 400, msg: '缺少参数 userId', data: null })
+        }
+        await Message.updateMany({ userId, status: 'unread' }, { status: 'read' })
+        res.json({ code: 200, msg: '全部已读', data: null })
+    } catch (err) {
+        next(err)
+    }
+}

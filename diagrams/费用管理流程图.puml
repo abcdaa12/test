@@ -1,0 +1,61 @@
+@startuml
+skinparam activity {
+  FontSize 13
+  BackgroundColor #F5F5F5
+  BorderColor #333333
+  DiamondBackgroundColor #FFFDE7
+  DiamondBorderColor #333333
+}
+
+start
+
+:用户填写收款标题、金额\n选择参与分摊的成员（多选）;
+
+:前端校验表单数据;
+
+if (标题是否为空？) then (是)
+  :提示"请填写完整信息";
+  stop
+else (否)
+endif
+
+if (金额是否有效？\n(大于0的数字)) then (否)
+  :提示"请输入有效金额";
+  stop
+else (是)
+endif
+
+if (是否已选择参与人？\n(至少选1人)) then (否)
+  :提示"请选择付款人";
+  stop
+else (是)
+endif
+
+:前端提交数据至后端\nPOST /api/finance/create;
+
+:后端验证必填参数完整性;
+
+if (参数是否有效？) then (否)
+  :返回错误信息;
+  :前端提示创建失败;
+  stop
+else (是)
+endif
+
+:创建财务记录文档\n存储至 Finance 集合;
+
+:返回创建成功响应;
+
+:前端提示"收款发起成功"\n刷新费用列表;
+
+fork
+  :异步查询宿舍成员列表;
+  :过滤掉发起人;
+  :调用 createNotification\n批量创建收款通知;
+fork again
+  :前端计算人均分摊金额\n更新当月统计数据;
+end fork
+
+stop
+
+@enduml

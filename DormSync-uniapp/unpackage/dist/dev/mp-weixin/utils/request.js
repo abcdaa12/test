@@ -1,7 +1,7 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-const BASE_URL = "http://172.20.42.135:3000";
-const TIMEOUT = 1e4;
+const BASE_URL = "http://192.168.5.5:3000";
+const TIMEOUT = 6e4;
 const request = (options = {}) => {
   return new Promise((resolve, reject) => {
     const header = {
@@ -49,7 +49,9 @@ const request = (options = {}) => {
 const get = (url, data) => request({ url, method: "GET", data });
 const post = (url, data) => request({ url, method: "POST", data });
 const put = (url, data) => request({ url, method: "PUT", data });
+const del = (url, data) => request({ url, method: "DELETE", data });
 exports.BASE_URL = BASE_URL;
+exports.del = del;
 exports.get = get;
 exports.post = post;
 exports.put = put;

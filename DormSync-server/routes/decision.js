@@ -17,4 +17,10 @@ router.post('/vote', authMiddleware, decisionController.castVote)
 // 查看宿舍所有决策（需要鉴权）
 router.get('/list', authMiddleware, decisionController.getDecisionList)
 
+// 删除决策（需要鉴权）
+router.delete('/delete', authMiddleware, decisionController.deleteDecision)
+
+// 编辑决策（需要鉴权）
+router.put('/update', authMiddleware, decisionController.updateDecision)
+
 module.exports = router

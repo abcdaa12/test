@@ -25,6 +25,8 @@ const decisionSchema = new mongoose.Schema({
     creatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     // 状态：active-进行中 ended-已结束
     status: { type: String, enum: ['active', 'ended'], default: 'active' },
+    // 是否匿名投票
+    anonymous: { type: Boolean, default: false },
     // 创建时间
     createdAt: { type: Date, default: Date.now }
 })

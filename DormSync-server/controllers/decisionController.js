@@ -4,9 +4,8 @@
  */
 const Decision = require('../models/Decision')
 const Dorm = require('../models/Dorm')
-const User = require('../models/User')
+const mongoose = require('mongoose')
 const { createNotification } = require('./messageController')
-const { sendDormActivity } = require('../utils/wxSubscribe')
 
 /**
  * 发起决策
@@ -16,7 +15,7 @@ const { sendDormActivity } = require('../utils/wxSubscribe')
  */
 exports.createDecision = async (req, res, next) => {
     try {
-        const { dormId, title, options, deadline, creatorId } = req.body
+        const { dormId, title, options, deadline, creatorId, anonymous } = req.body
 
         if (!dormId || !title || !options || !deadline || !creatorId) {
             return res.json({ code: 400, msg: '缺少必填参数（dormId/title/options/deadline/creatorId）', data: null })
@@ -37,7 +36,8 @@ exports.createDecision = async (req, res, next) => {
             options: formattedOptions,
             deadline,
             creatorId,
-            status: 'active'
+            status: 'active',
+            anonymous: !!anonymous
         })
 
         res.json({ code: 200, msg: '决策发起成功', data: decision })
@@ -52,10 +52,6 @@ exports.createDecision = async (req, res, next) => {
                     type: 'vote',
                     content: `投票通知：${title}，请参与投票`
                 })
-                // 微信推送
-                const users = await User.find({ _id: { $in: otherMembers } }, 'openid')
-                const openids = users.map(u => u.openid).filter(Boolean)
-                sendDormActivity(openids, '新投票', `${title}，请参与投票`).catch(e => console.error(e))
             }
         } catch (e) { console.error('发送投票通知失败', e) }
     } catch (err) {
@@ -103,7 +99,7 @@ exports.castVote = async (req, res, next) => {
         }
 
         decision.options[optionIndex].count += 1
-        decision.voters.push({ userId, optionIndex })
+        decision.voters.push({ userId: new mongoose.Types.ObjectId(userId), optionIndex })
         await decision.save()
 
         res.json({ code: 200, msg: '投票成功', data: decision })
@@ -125,9 +121,54 @@ exports.getDecisionList = async (req, res, next) => {
 
         const list = await Decision.find({ dormId })
             .populate('creatorId', 'nickname avatar')
+            .populate({ path: 'voters.userId', select: 'nickname avatar' })
             .sort({ createdAt: -1 })
 
         res.json({ code: 200, msg: '查询成功', data: list })
+    } catch (err) {
+        next(err)
+    }
+}
+
+/**
+ * 删除决策
+ * DELETE /api/decision/delete
+ * Body: { decisionId }
+ */
+exports.deleteDecision = async (req, res, next) => {
+    try {
+        const { decisionId } = req.body
+        if (!decisionId) {
+            return res.json({ code: 400, msg: '缺少参数 decisionId', data: null })
+        }
+        const decision = await Decision.findByIdAndDelete(decisionId)
+        if (!decision) return res.json({ code: 404, msg: '投票不存在', data: null })
+        res.json({ code: 200, msg: '删除成功', data: null })
+    } catch (err) {
+        next(err)
+    }
+}
+
+/**
+ * 编辑决策（仅允许编辑标题、截止时间、匿名状态，且投票进行中时才可编辑）
+ * PUT /api/decision/update
+ * Body: { decisionId, title?, deadline?, anonymous? }
+ */
+exports.updateDecision = async (req, res, next) => {
+    try {
+        const { decisionId, title, deadline, anonymous } = req.body
+        if (!decisionId) {
+            return res.json({ code: 400, msg: '缺少参数 decisionId', data: null })
+        }
+        const decision = await Decision.findById(decisionId)
+        if (!decision) return res.json({ code: 404, msg: '投票不存在', data: null })
+
+        if (title !== undefined) decision.title = title
+        if (deadline !== undefined) decision.deadline = deadline
+        if (anonymous !== undefined) decision.anonymous = anonymous
+        await decision.save()
+
+        res.json({ code: 200, msg: '更新成功', data: decision })
     } catch (err) {
         next(err)
     }

@@ -8,9 +8,23 @@ const _sfc_main = {
   __name: "login",
   setup(__props) {
     const loading = common_vendor.ref(false);
+    common_vendor.onLoad((options) => {
+      if (options && options.dormNumber) {
+        const dormNumber = decodeURIComponent(options.dormNumber);
+        common_vendor.index.__f__("log", "at pages/login/login.vue:33", "登录页收到邀请宿舍号:", dormNumber);
+        common_vendor.index.setStorageSync("inviteDormNumber", dormNumber);
+      }
+    });
     common_vendor.onShow(() => {
       if (utils_auth.isLoggedIn()) {
-        goHome();
+        const userInfo = common_vendor.index.getStorageSync("userInfo") || {};
+        const inviteDorm = common_vendor.index.getStorageSync("inviteDormNumber");
+        if (inviteDorm && !userInfo.dormId) {
+          common_vendor.index.redirectTo({ url: "/pages/dorm-setup/dorm-setup" });
+        } else {
+          common_vendor.index.removeStorageSync("inviteDormNumber");
+          goHome();
+        }
       }
     });
     const goHome = () => {
@@ -26,12 +40,15 @@ const _sfc_main = {
         setTimeout(() => {
           if (!userInfo.nickname || userInfo.nickname === "宿舍成员") {
             common_vendor.index.redirectTo({ url: "/pages/profile-edit/profile-edit?first=1" });
+          } else if (!userInfo.dormId) {
+            common_vendor.index.redirectTo({ url: "/pages/dorm-setup/dorm-setup" });
           } else {
+            common_vendor.index.removeStorageSync("inviteDormNumber");
             goHome();
           }
         }, 500);
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/login/login.vue:61", "登录失败", e);
+        common_vendor.index.__f__("error", "at pages/login/login.vue:82", "登录失败", e);
       } finally {
         loading.value = false;
       }

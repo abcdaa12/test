@@ -1,0 +1,87 @@
+@startuml
+skinparam activity {
+  FontSize 13
+  BackgroundColor #F5F5F5
+  BorderColor #333333
+  DiamondBackgroundColor #FFFDE7
+  DiamondBorderColor #333333
+}
+
+start
+
+if (操作类型？) then (发起投票)
+
+  :填写投票主题、添加选项\n设置截止时间、匿名开关;
+
+  if (主题是否为空？) then (是)
+    :提示"请输入投票主题";
+    stop
+  else (否)
+  endif
+
+  if (有效选项是否≥2个？) then (否)
+    :提示"选项至少需要2个";
+    stop
+  else (是)
+  endif
+
+  if (是否已设置截止日期？) then (否)
+    :提示"请选择截止日期";
+    stop
+  else (是)
+  endif
+
+  :前端提交数据至后端\nPOST /api/decision/create;
+
+  :后端格式化选项数组\n(count初始值为0);
+
+  :创建投票文档\n存储至 Decision 集合;
+
+  :返回创建成功响应;
+
+  :前端提示"投票发起成功"\n刷新投票列表;
+
+  :异步通知宿舍其他成员;
+
+  stop
+
+else (参与投票)
+
+  :用户点击选项进行投票;
+
+  :前端提交至后端\nPOST /api/decision/vote;
+
+  :后端查询投票文档;
+
+  if (投票状态是否为进行中？) then (否)
+    :提示"投票已结束";
+    stop
+  else (是)
+  endif
+
+  if (是否已超过截止时间？) then (是)
+    :更新状态为ended;
+    :提示"投票已过截止时间";
+    stop
+  else (否)
+  endif
+
+  if (当前用户是否已投过票？) then (是)
+    :提示"你已经投过票了";
+    stop
+  else (否)
+  endif
+
+  :对应选项票数+1\n记录用户ID和选项索引;
+
+  :保存更新后的文档;
+
+  :返回投票成功响应;
+
+  :前端显示投票结果百分比;
+
+  stop
+
+endif
+
+@enduml

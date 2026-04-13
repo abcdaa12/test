@@ -48,25 +48,27 @@ const wxLogin = () => {
               avatarServer: userInfo.avatar || "",
               phone: userInfo.phone || "",
               className: userInfo.class || "",
-              signature: userInfo.signature || ""
+              signature: userInfo.signature || "",
+              dormId: userInfo.dormId || "",
+              role: userInfo.role || "member"
             };
             common_vendor.index.setStorageSync("token", token);
             common_vendor.index.setStorageSync("userInfo", finalUserInfo);
             common_vendor.index.setStorageSync("userId", userInfo._id || "");
-            common_vendor.index.__f__("log", "at utils/auth.js:75", "登录成功：", finalUserInfo.nickname, "头像:", avatarUrl);
+            common_vendor.index.__f__("log", "at utils/auth.js:77", "登录成功：", finalUserInfo.nickname, "头像:", avatarUrl);
             resolve(finalUserInfo);
           } else {
             common_vendor.index.showToast({ title: res.message || "登录失败", icon: "none" });
             reject(new Error(res.message || "后端返回异常"));
           }
         } catch (err) {
-          common_vendor.index.__f__("error", "at utils/auth.js:82", "登录接口调用失败：", err);
+          common_vendor.index.__f__("error", "at utils/auth.js:84", "登录接口调用失败：", err);
           common_vendor.index.showToast({ title: "登录失败，请重试", icon: "none" });
           reject(err);
         }
       },
       fail: (err) => {
-        common_vendor.index.__f__("error", "at utils/auth.js:88", "wx.login 调用失败：", err);
+        common_vendor.index.__f__("error", "at utils/auth.js:90", "wx.login 调用失败：", err);
         common_vendor.index.showToast({ title: "登录失败，请重试", icon: "none" });
         reject(err);
       }

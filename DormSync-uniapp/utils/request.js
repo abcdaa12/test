@@ -5,10 +5,10 @@
  */
 
 // 后端接口基础地址
-export const BASE_URL = 'http://172.20.42.135:3000'
+export const BASE_URL = 'http://192.168.5.5:3000'
 
 // 请求超时时间（毫秒）
-const TIMEOUT = 10000
+const TIMEOUT = 60000
 
 /**
  * 封装的请求方法

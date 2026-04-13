@@ -9,7 +9,14 @@
     "pages/vote/vote",
     "pages/schedule/schedule",
     "pages/profile-edit/profile-edit",
-    "pages/language/language"
+    "pages/language/language",
+    "pages/dorm-setup/dorm-setup",
+    "pages/invite/invite",
+    "pages/members/members",
+    "pages/election/election",
+    "pages/about/about",
+    "pages/terms/terms",
+    "pages/announce/announce"
   ],
   "window": {
     "navigationBarTextStyle": "white",

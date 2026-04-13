@@ -30,7 +30,7 @@
 					</view>
 				</view>
 
-				<view class="notice-card">
+				<view class="notice-card" @tap="goTo('/pages/announce/announce')">
 					<view class="section-header">
 						<text class="section-title">📢 {{ t('home.notice') }}</text>
 					</view>
@@ -59,8 +59,8 @@
 							:key="item._id || index"
 							class="todo-item"
 						>
-							<view class="todo-left" @tap="doneTodo(item)">
-								<text class="todo-check">☐</text>
+							<view class="todo-left">
+								<text class="todo-dot">•</text>
 								<text class="todo-text">{{ item.content }}</text>
 							</view>
 							<text class="todo-del" @tap="deleteTodo(item)">✕</text>
@@ -78,7 +78,7 @@
 <script setup>
 import { ref } from 'vue'
 import { onShow, onShareAppMessage } from '@dcloudio/uni-app'
-import { get, post, put, del } from '../../utils/request.js'
+import { get, post, del } from '../../utils/request.js'
 import { isLoggedIn, getLocalUserInfo } from '../../utils/auth.js'
 import { t } from '../../utils/i18n.js'
 import { isDark, applyNavBarTheme } from '../../utils/theme.js'
@@ -123,13 +123,6 @@ const addTodo = async () => {
 	} catch (e) { console.error('创建待办失败', e) }
 }
 
-const doneTodo = async (item) => {
-	try {
-		const res = await put('/api/todo/done', { todoId: item._id })
-		if (res.code === 200) fetchTodoList()
-	} catch (e) { console.error(e) }
-}
-
 const deleteTodo = async (item) => {
 	try {
 		const res = await del('/api/todo/delete', { todoId: item._id })
@@ -144,7 +137,13 @@ const fetchDormInfo = async () => {
 		const res = await get(`/api/dorm/info?dormId=${userInfo.dormId}`)
 		if (res.code === 200 && res.data) {
 			dormNo.value = res.data.dormNumber || ''
-			announcement.value = res.data.notice || t('home.noNotice')
+		}
+		// 获取最新公告
+		const aRes = await get(`/api/announce/list?dormId=${userInfo.dormId}`)
+		if (aRes.code === 200 && aRes.data && aRes.data.length > 0) {
+			announcement.value = aRes.data[0].title
+		} else {
+			announcement.value = t('home.noNotice')
 		}
 	} catch (e) { console.error('获取宿舍信息失败', e) }
 }
@@ -171,22 +170,6 @@ const onRefresh = async () => {
 	refreshing.value = false
 }
 
-// 请求微信订阅消息授权
-const requestSubscribe = () => {
-	// #ifdef MP-WEIXIN
-	const tmplIds = [
-		'YOUR_DORM_ACTIVITY_TEMPLATE_ID',
-		'YOUR_DUTY_REMINDER_TEMPLATE_ID'
-	].filter(id => !id.startsWith('YOUR_'))
-	if (tmplIds.length === 0) return
-	uni.requestSubscribeMessage({
-		tmplIds,
-		success(res) { console.log('订阅授权结果:', res) },
-		fail(err) { console.log('订阅授权取消:', err) }
-	})
-	// #endif
-}
-
 onShow(() => {
 	applyNavBarTheme()
 	if (!isLoggedIn()) {
@@ -203,8 +186,6 @@ onShow(() => {
 	fetchDormInfo()
 	fetchTodoList()
 	fetchUnreadCount()
-	// 请求订阅消息授权（宿舍动态 + 值日提醒）
-	requestSubscribe()
 })
 </script>
 
@@ -255,8 +236,7 @@ onShow(() => {
 }
 .todo-item:last-child { border-bottom: none; }
 .todo-left { display: flex; align-items: center; flex: 1; }
-.todo-left:active { opacity: 0.6; }
-.todo-check { font-size: 32rpx; margin-right: 12rpx; color: var(--color-primary); }
+.todo-dot { font-size: 32rpx; margin-right: 12rpx; color: var(--color-primary); }
 .todo-text { font-size: 28rpx; color: var(--text-primary); flex: 1; }
 .todo-del { font-size: 28rpx; color: #ff4d4f; padding: 8rpx 16rpx; }
 .todo-empty { text-align: center; padding: 40rpx 0; color: var(--text-hint); font-size: 28rpx; }

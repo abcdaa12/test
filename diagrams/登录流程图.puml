@@ -1,0 +1,56 @@
+@startuml
+skinparam activity {
+  FontSize 13
+  BackgroundColor #F5F5F5
+  BorderColor #333333
+  DiamondBackgroundColor #FFFDE7
+  DiamondBorderColor #333333
+}
+
+start
+
+:用户点击"微信一键登录"按钮;
+
+:前端调用 uni.login\n获取临时登录凭证 code;
+
+:前端将 code 发送至后端\nPOST /api/user/login;
+
+:后端携带 AppID、AppSecret\n调用微信 jscode2session 接口;
+
+if (获取 openid 成功？) then (否)
+  :返回"微信登录失败"错误信息;
+  :前端提示登录失败;
+  stop
+else (是)
+endif
+
+:根据 openid 查询用户集合;
+
+if (用户是否存在？) then (否)
+  :自动创建新用户\n(默认昵称"宿舍成员");
+else (是)
+endif
+
+:生成 JWT 令牌（有效期7天）;
+
+:返回令牌和用户信息给前端;
+
+:前端存储令牌和用户信息\n至本地缓存;
+
+if (昵称是否为默认值？) then (是)
+  :跳转至个人信息编辑页面;
+  stop
+else (否)
+endif
+
+if (用户是否已加入宿舍？) then (否)
+  :跳转至宿舍设置页面;
+  stop
+else (是)
+endif
+
+:跳转至系统首页;
+
+stop
+
+@enduml

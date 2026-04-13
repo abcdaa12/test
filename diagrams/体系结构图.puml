@@ -1,0 +1,60 @@
+@startuml
+skinparam rectangle {
+  RoundCorner 10
+  FontSize 13
+}
+skinparam package {
+  FontSize 14
+  FontStyle bold
+}
+
+package "表现层（UniApp 微信小程序）" as P1 #E3F2FD {
+  rectangle "首页" as p1
+  rectangle "费用管理" as p2
+  rectangle "投票决策" as p3
+  rectangle "排班管理" as p4
+  rectangle "公告管理" as p5
+  rectangle "消息中心" as p6
+  rectangle "成员管理" as p7
+  rectangle "个人中心" as p8
+  rectangle "i18n国际化" as p9
+  rectangle "夜间模式" as p10
+}
+
+package "业务逻辑层（Node.js + Express）" as P2 #E8F5E9 {
+  rectangle "用户认证\n(JWT)" as b1
+  rectangle "宿舍管理\ndormController" as b2
+  rectangle "费用管理\nfinanceController" as b3
+  rectangle "投票决策\ndecisionController" as b4
+  rectangle "排班管理\nscheduleController" as b5
+  rectangle "公告管理\nannounceController" as b6
+  rectangle "消息通知\nmessageController" as b7
+  rectangle "待办事项\ntodoController" as b8
+  rectangle "AI排班\nDeepSeek API" as b9
+}
+
+package "数据访问层（Mongoose ODM）" as P3 #FFF3E0 {
+  rectangle "User" as d1
+  rectangle "Dorm" as d2
+  rectangle "Finance" as d3
+  rectangle "Decision" as d4
+  rectangle "Schedule" as d5
+  rectangle "Announce" as d6
+  rectangle "Message" as d7
+  rectangle "Todo" as d8
+  rectangle "Task" as d9
+}
+
+package "数据存储层（MongoDB Atlas）" as P4 #F3E5F5 {
+  rectangle "MongoDB 文档型数据库\n（云数据库服务）" as db
+}
+
+P1 -[hidden]down- P2
+P2 -[hidden]down- P3
+P3 -[hidden]down- P4
+
+P1 -down-> P2 : HTTP / RESTful API
+P2 -down-> P3 : Mongoose 数据操作
+P3 -down-> P4 : BSON 文档存储
+
+@enduml

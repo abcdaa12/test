@@ -1,0 +1,60 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #F5F5F5
+  BorderColor #333333
+  FontSize 13
+}
+skinparam actor {
+  FontSize 14
+}
+
+rectangle "DormSync 宿舍协同管理系统" {
+  actor "宿舍成员" as member
+  actor "宿舍长" as leader
+
+  usecase "微信登录" as UC1
+  usecase "个人信息管理" as UC2
+  usecase "创建宿舍" as UC3
+  usecase "加入宿舍" as UC4
+  usecase "待办事项管理" as UC5
+  usecase "费用管理" as UC6
+  usecase "投票决策" as UC7
+  usecase "排班管理" as UC8
+  usecase "查看公告" as UC9
+  usecase "消息中心" as UC10
+  usecase "查看成员列表" as UC11
+  usecase "语言切换" as UC12
+  usecase "夜间模式" as UC13
+
+  usecase "发布公告" as UC14
+  usecase "删除公告" as UC15
+  usecase "宿舍长选举" as UC16
+  usecase "邀请成员" as UC17
+  usecase "AI智能排班" as UC18
+
+  member --> UC1
+  member --> UC2
+  member --> UC3
+  member --> UC4
+  member --> UC5
+  member --> UC6
+  member --> UC7
+  member --> UC8
+  member --> UC9
+  member --> UC10
+  member --> UC11
+  member --> UC12
+  member --> UC13
+
+  leader --|> member
+
+  leader --> UC14
+  leader --> UC15
+  leader --> UC16
+  leader --> UC17
+
+  UC8 <.. UC18 : <<extend>>
+}
+@enduml

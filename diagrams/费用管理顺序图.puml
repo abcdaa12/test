@@ -1,0 +1,35 @@
+@startuml
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam style strictuml
+
+actor "宿舍成员" as user
+participant "前端页面" as front
+participant "后端控制器\nfinanceController" as backend
+database "MongoDB\nFinance集合" as db
+participant "消息模块\nmessageController" as msg
+
+user -> front : 填写收款标题、金额\n选择参与分摊的成员（多选）
+front -> front : 前端校验\n(标题非空、金额>0、已选至少1人)
+
+alt 校验失败
+    front --> user : 提示错误信息
+else 校验通过
+    front -> backend : POST /api/finance/create\n{dormId, title, amount, creatorId, payeeIds}
+    backend -> backend : 验证必填参数\n验证金额有效性
+
+    alt 参数无效
+        backend --> front : {code:400, msg:"缺少必填参数"}
+        front --> user : 提示创建失败
+    else 参数有效
+        backend -> db : 创建财务记录文档
+        db --> backend : 返回创建结果
+        backend --> front : {code:200, msg:"收款发起成功"}
+        front --> user : 提示创建成功\n刷新费用列表
+
+        backend ->> msg : 异步调用 createNotification
+        msg -> db : 批量创建通知消息\n(通知除发起人外的宿舍成员)
+    end
+end
+
+@enduml

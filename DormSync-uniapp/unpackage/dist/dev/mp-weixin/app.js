@@ -15,24 +15,41 @@ if (!Math) {
   "./pages/schedule/schedule.js";
   "./pages/profile-edit/profile-edit.js";
   "./pages/language/language.js";
+  "./pages/dorm-setup/dorm-setup.js";
+  "./pages/invite/invite.js";
+  "./pages/members/members.js";
+  "./pages/election/election.js";
+  "./pages/about/about.js";
+  "./pages/terms/terms.js";
+  "./pages/announce/announce.js";
 }
 const _sfc_main = {
   __name: "App",
   setup(__props) {
-    common_vendor.onLaunch(() => {
-      common_vendor.index.__f__("log", "at App.vue:13", "App Launch - 宿舍协同管理小程序启动");
+    common_vendor.onLaunch((options) => {
+      common_vendor.index.__f__("log", "at App.vue:13", "App Launch - 宿舍协同管理小程序启动", options);
       utils_i18n.updateTabBar();
       utils_theme.initTheme();
+      if (options && options.query && options.query.dormNumber) {
+        const dormNumber = decodeURIComponent(options.query.dormNumber);
+        common_vendor.index.__f__("log", "at App.vue:20", "从分享卡片获取宿舍号:", dormNumber);
+        common_vendor.index.setStorageSync("inviteDormNumber", dormNumber);
+      }
       if (utils_auth.isLoggedIn()) {
-        common_vendor.index.__f__("log", "at App.vue:19", "本地已有登录态，跳转首页");
-        common_vendor.index.switchTab({ url: "/pages/index/index" });
+        const userInfo = common_vendor.index.getStorageSync("userInfo") || {};
+        const inviteDorm = common_vendor.index.getStorageSync("inviteDormNumber");
+        if (inviteDorm && !userInfo.dormId) {
+          common_vendor.index.redirectTo({ url: "/pages/dorm-setup/dorm-setup" });
+        } else {
+          common_vendor.index.switchTab({ url: "/pages/index/index" });
+        }
       }
     });
     common_vendor.onShow(() => {
-      common_vendor.index.__f__("log", "at App.vue:26", "App Show - 小程序进入前台");
+      common_vendor.index.__f__("log", "at App.vue:38", "App Show - 小程序进入前台");
     });
     common_vendor.onHide(() => {
-      common_vendor.index.__f__("log", "at App.vue:30", "App Hide - 小程序进入后台");
+      common_vendor.index.__f__("log", "at App.vue:42", "App Hide - 小程序进入后台");
     });
     return () => {
     };

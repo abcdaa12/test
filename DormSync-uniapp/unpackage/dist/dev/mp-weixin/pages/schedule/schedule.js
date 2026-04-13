@@ -1,16 +1,22 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_request = require("../../utils/request.js");
 const utils_i18n = require("../../utils/i18n.js");
 const utils_theme = require("../../utils/theme.js");
+const utils_auth = require("../../utils/auth.js");
 const _sfc_main = {
   __name: "schedule",
   setup(__props) {
-    const members = common_vendor.ref(["张三", "李四", "王五", "赵六"]);
-    const cycleOptions = common_vendor.computed(() => [utils_i18n.t("schedule.weekly"), utils_i18n.t("schedule.daily")]);
-    const cycleIndex = common_vendor.ref(0);
-    const scheduleList = common_vendor.ref([]);
-    const historyList = common_vendor.ref([]);
-    const weekdayMap = common_vendor.computed(() => [
+    const currentYear = common_vendor.ref((/* @__PURE__ */ new Date()).getFullYear());
+    const currentMonth = common_vendor.ref((/* @__PURE__ */ new Date()).getMonth());
+    const scheduleItems = common_vendor.ref([]);
+    const members = common_vendor.ref([]);
+    const aiPrompt = common_vendor.ref("");
+    const aiLoading = common_vendor.ref(false);
+    const aiResult = common_vendor.ref([]);
+    const dayDetailVisible = common_vendor.ref(false);
+    const selectedDay = common_vendor.ref({});
+    const weekHeaders = common_vendor.computed(() => [
       utils_i18n.t("schedule.sun"),
       utils_i18n.t("schedule.mon"),
       utils_i18n.t("schedule.tue"),
@@ -19,102 +25,267 @@ const _sfc_main = {
       utils_i18n.t("schedule.fri"),
       utils_i18n.t("schedule.sat")
     ]);
-    const currentWeekLabel = common_vendor.computed(() => {
-      const now = /* @__PURE__ */ new Date();
-      const monday = new Date(now);
-      const day = now.getDay() || 7;
-      monday.setDate(now.getDate() - day + 1);
-      const sunday = new Date(monday);
-      sunday.setDate(monday.getDate() + 6);
-      return `${formatDate(monday)} ~ ${formatDate(sunday)}`;
+    const weekdayNames = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+    const calendarDays = common_vendor.computed(() => {
+      const year = currentYear.value;
+      const month = currentMonth.value;
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const today = /* @__PURE__ */ new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+      const previewMap = {};
+      aiResult.value.forEach((item) => {
+        previewMap[item.date] = item.personName;
+      });
+      const cells = [];
+      const prevDays = new Date(year, month, 0).getDate();
+      for (let i = firstDay - 1; i >= 0; i--) {
+        cells.push({ day: prevDays - i, isOtherMonth: true, dateStr: "", person: "" });
+      }
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+        const saved = scheduleItems.value.find((s) => s.date === dateStr);
+        const previewName = previewMap[dateStr];
+        cells.push({
+          day: d,
+          isOtherMonth: false,
+          dateStr,
+          isToday: dateStr === todayStr,
+          person: previewName || (saved ? saved.personName : ""),
+          isPreview: !!previewName && !saved,
+          weekday: weekdayNames[new Date(year, month, d).getDay()]
+        });
+      }
+      const remain = 42 - cells.length;
+      for (let i = 1; i <= remain; i++) {
+        cells.push({ day: i, isOtherMonth: true, dateStr: "", person: "" });
+      }
+      return cells;
     });
-    const formatDate = (date) => {
-      const m = String(date.getMonth() + 1).padStart(2, "0");
-      const d = String(date.getDate()).padStart(2, "0");
-      return `${m}-${d}`;
-    };
-    const formatFullDate = (date) => {
-      const y = date.getFullYear();
-      return `${y}-${formatDate(date)}`;
-    };
-    const onCycleChange = (e) => {
-      cycleIndex.value = Number(e.detail.value);
-    };
-    const generateSchedule = () => {
-      const now = /* @__PURE__ */ new Date();
-      const day = now.getDay() || 7;
-      const monday = new Date(now);
-      monday.setDate(now.getDate() - day + 1);
-      const list = [];
-      for (let i = 0; i < 7; i++) {
-        const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
-        list.push({
-          date: formatFullDate(d),
-          weekday: weekdayMap.value[d.getDay()],
-          person: members.value[i % members.value.length]
-        });
+    const changeMonth = (delta) => {
+      let m = currentMonth.value + delta;
+      let y = currentYear.value;
+      if (m < 0) {
+        m = 11;
+        y--;
       }
-      if (scheduleList.value.length > 0) {
-        historyList.value.unshift({
-          label: currentWeekLabel.value,
-          items: [...scheduleList.value]
-        });
+      if (m > 11) {
+        m = 0;
+        y++;
       }
-      scheduleList.value = list;
-      common_vendor.index.showToast({ title: utils_i18n.t("schedule.generated"), icon: "success" });
+      currentMonth.value = m;
+      currentYear.value = y;
+      fetchSchedule();
+    };
+    const onDayTap = (day) => {
+      selectedDay.value = day;
+      dayDetailVisible.value = true;
+    };
+    const assignDuty = (day, member) => {
+      const previewIdx = aiResult.value.findIndex((i) => i.date === day.dateStr);
+      if (previewIdx >= 0) {
+        aiResult.value[previewIdx].personName = member.nickname;
+        aiResult.value[previewIdx].personId = member._id;
+      } else if (aiResult.value.length > 0) {
+        aiResult.value.push({ date: day.dateStr, weekday: day.weekday, personName: member.nickname, personId: member._id });
+      } else {
+        const idx = scheduleItems.value.findIndex((i) => i.date === day.dateStr);
+        if (idx >= 0) {
+          scheduleItems.value[idx].personName = member.nickname;
+          scheduleItems.value[idx].personId = member._id;
+        } else {
+          scheduleItems.value.push({ date: day.dateStr, weekday: day.weekday, personName: member.nickname, personId: member._id });
+        }
+      }
+      dayDetailVisible.value = false;
+    };
+    const clearDuty = (day) => {
+      const previewIdx = aiResult.value.findIndex((i) => i.date === day.dateStr);
+      if (previewIdx >= 0) {
+        aiResult.value.splice(previewIdx, 1);
+      } else {
+        const idx = scheduleItems.value.findIndex((i) => i.date === day.dateStr);
+        if (idx >= 0)
+          scheduleItems.value.splice(idx, 1);
+      }
+      dayDetailVisible.value = false;
+    };
+    const fetchMembers = async () => {
+      const userInfo = utils_auth.getLocalUserInfo();
+      if (!userInfo.dormId)
+        return;
+      try {
+        const res = await utils_request.get(`/api/dorm/members?dormId=${userInfo.dormId}`);
+        if (res.code === 200)
+          members.value = res.data || [];
+      } catch (e) {
+        common_vendor.index.__f__("error", "at pages/schedule/schedule.vue:203", e);
+      }
+    };
+    const fetchSchedule = async () => {
+      const userInfo = utils_auth.getLocalUserInfo();
+      if (!userInfo.dormId)
+        return;
+      try {
+        const res = await utils_request.get(`/api/schedule/current?dormId=${userInfo.dormId}`);
+        const currentItems = res.code === 200 && res.data ? res.data.items || [] : [];
+        const hRes = await utils_request.get(`/api/schedule/history?dormId=${userInfo.dormId}`);
+        const historyItems = [];
+        if (hRes.code === 200 && hRes.data) {
+          hRes.data.forEach((h) => {
+            if (h.items)
+              historyItems.push(...h.items);
+          });
+        }
+        const map = {};
+        historyItems.forEach((item) => {
+          map[item.date] = item;
+        });
+        currentItems.forEach((item) => {
+          map[item.date] = item;
+        });
+        scheduleItems.value = Object.values(map);
+      } catch (e) {
+        common_vendor.index.__f__("error", "at pages/schedule/schedule.vue:225", e);
+      }
+    };
+    const callAI = async () => {
+      if (!aiPrompt.value.trim() || aiLoading.value)
+        return;
+      const userInfo = utils_auth.getLocalUserInfo();
+      if (!userInfo.dormId)
+        return;
+      aiLoading.value = true;
+      try {
+        const startDate = `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, "0")}-01`;
+        const daysInMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate();
+        const res = await utils_request.post("/api/schedule/ai-generate", {
+          dormId: userInfo.dormId,
+          prompt: aiPrompt.value.trim(),
+          startDate,
+          days: daysInMonth
+        });
+        if (res.code === 200 && res.data) {
+          aiResult.value = res.data.items || [];
+          common_vendor.index.showToast({ title: utils_i18n.t("schedule.aiSuccess"), icon: "success" });
+        } else {
+          common_vendor.index.showToast({ title: res.msg || utils_i18n.t("schedule.aiFail"), icon: "none" });
+        }
+      } catch (e) {
+        common_vendor.index.__f__("error", "at pages/schedule/schedule.vue:249", e);
+        common_vendor.index.showToast({ title: utils_i18n.t("schedule.aiFail"), icon: "none" });
+      } finally {
+        aiLoading.value = false;
+      }
+    };
+    const saveAIResult = async () => {
+      const userInfo = utils_auth.getLocalUserInfo();
+      if (!userInfo.dormId || aiResult.value.length === 0)
+        return;
+      const items = aiResult.value;
+      const weekLabel = `${items[0].date} ~ ${items[items.length - 1].date}`;
+      try {
+        const res = await utils_request.post("/api/schedule/create", {
+          dormId: userInfo.dormId,
+          weekLabel,
+          cycle: "weekly",
+          items
+        });
+        if (res.code === 200) {
+          common_vendor.index.showToast({ title: utils_i18n.t("schedule.saved"), icon: "success" });
+          aiResult.value = [];
+          aiPrompt.value = "";
+          fetchSchedule();
+        }
+      } catch (e) {
+        common_vendor.index.__f__("error", "at pages/schedule/schedule.vue:269", e);
+      }
     };
     common_vendor.onShow(() => {
       utils_theme.applyNavBarTheme();
       common_vendor.index.setNavigationBarTitle({ title: utils_i18n.t("schedule.title") });
-    });
-    common_vendor.onMounted(async () => {
+      fetchMembers().then(() => fetchSchedule());
     });
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.setting")),
-        b: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.cycle")),
-        c: common_vendor.t(cycleOptions.value[cycleIndex.value]),
-        d: cycleOptions.value,
-        e: common_vendor.o(onCycleChange),
-        f: cycleIndex.value,
-        g: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.members")),
-        h: common_vendor.t(members.value.join("、")),
-        i: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.generate")),
-        j: common_vendor.o(generateSchedule),
-        k: common_vendor.t(currentWeekLabel.value),
-        l: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.table")),
-        m: scheduleList.value.length === 0
-      }, scheduleList.value.length === 0 ? {
-        n: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.noSchedule"))
-      } : {}, {
-        o: common_vendor.f(scheduleList.value, (item, index, i0) => {
+        a: common_vendor.o(($event) => changeMonth(-1)),
+        b: common_vendor.t(currentYear.value),
+        c: common_vendor.t(String(currentMonth.value + 1).padStart(2, "0")),
+        d: common_vendor.o(($event) => changeMonth(1)),
+        e: common_vendor.f(weekHeaders.value, (w, i, i0) => {
           return {
-            a: common_vendor.t(item.date),
-            b: common_vendor.t(item.weekday),
-            c: common_vendor.t(item.person),
-            d: index
+            a: common_vendor.t(w),
+            b: i
           };
         }),
-        p: historyList.value.length > 0
-      }, historyList.value.length > 0 ? {
-        q: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.history")),
-        r: common_vendor.f(historyList.value, (week, wi, i0) => {
-          return {
-            a: common_vendor.t(week.label),
-            b: common_vendor.f(week.items, (item, si, i1) => {
-              return {
-                a: common_vendor.t(item.date),
-                b: common_vendor.t(item.weekday),
-                c: common_vendor.t(item.person),
-                d: si
-              };
-            }),
-            c: wi
-          };
-        })
+        f: common_vendor.f(calendarDays.value, (day, i, i0) => {
+          return common_vendor.e({
+            a: common_vendor.t(day.day || ""),
+            b: day.person
+          }, day.person ? {
+            c: common_vendor.t(day.person),
+            d: common_vendor.n(day.isPreview ? "preview-text" : "")
+          } : {}, {
+            e: i,
+            f: common_vendor.n(day.isToday ? "today" : ""),
+            g: common_vendor.n(day.isOtherMonth ? "other-month" : ""),
+            h: common_vendor.n(day.person ? "has-duty" : ""),
+            i: common_vendor.n(day.isPreview ? "preview-duty" : ""),
+            j: common_vendor.o(($event) => day.dateStr && onDayTap(day), i)
+          });
+        }),
+        g: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.aiTitle")),
+        h: common_vendor.unref(utils_i18n.t)("schedule.aiPh"),
+        i: common_vendor.o(callAI),
+        j: aiPrompt.value,
+        k: common_vendor.o(($event) => aiPrompt.value = $event.detail.value),
+        l: common_vendor.t(aiLoading.value ? "..." : common_vendor.unref(utils_i18n.t)("schedule.aiBtn")),
+        m: common_vendor.o(callAI),
+        n: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.aiTipTitle")),
+        o: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.aiEx1")),
+        p: common_vendor.o(($event) => aiPrompt.value = common_vendor.unref(utils_i18n.t)("schedule.aiEx1")),
+        q: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.aiEx2")),
+        r: common_vendor.o(($event) => aiPrompt.value = common_vendor.unref(utils_i18n.t)("schedule.aiEx2")),
+        s: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.aiEx3")),
+        t: common_vendor.o(($event) => aiPrompt.value = common_vendor.unref(utils_i18n.t)("schedule.aiEx3")),
+        v: aiResult.value.length > 0
+      }, aiResult.value.length > 0 ? {
+        w: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.aiResult")),
+        x: common_vendor.t(aiResult.value.length),
+        y: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.days")),
+        z: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.previewHint")),
+        A: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.saveSchedule")),
+        B: common_vendor.o(saveAIResult),
+        C: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.discard")),
+        D: common_vendor.o(($event) => aiResult.value = [])
       } : {}, {
-        s: common_vendor.n(common_vendor.unref(utils_theme.isDark) ? "dark-mode" : "")
+        E: dayDetailVisible.value
+      }, dayDetailVisible.value ? common_vendor.e({
+        F: common_vendor.t(selectedDay.value.dateStr),
+        G: common_vendor.t(selectedDay.value.weekday),
+        H: common_vendor.o(($event) => dayDetailVisible.value = false),
+        I: selectedDay.value.person
+      }, selectedDay.value.person ? {
+        J: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.dutyPerson")),
+        K: common_vendor.t(selectedDay.value.person)
+      } : {
+        L: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.noDuty"))
+      }, {
+        M: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.editDuty")),
+        N: common_vendor.f(members.value, (m, k0, i0) => {
+          return {
+            a: common_vendor.t(m.nickname),
+            b: m._id,
+            c: common_vendor.o(($event) => assignDuty(selectedDay.value, m), m._id)
+          };
+        }),
+        O: common_vendor.t(common_vendor.unref(utils_i18n.t)("schedule.clearDuty")),
+        P: common_vendor.o(($event) => clearDuty(selectedDay.value)),
+        Q: common_vendor.o(() => {
+        }),
+        R: common_vendor.o(($event) => dayDetailVisible.value = false)
+      }) : {}, {
+        S: common_vendor.n(common_vendor.unref(utils_theme.isDark) ? "dark-mode" : "")
       });
     };
   }

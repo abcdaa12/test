@@ -5,26 +5,38 @@
 				<text class="module-title">🗳️ {{ t('more.decision') }}</text>
 				<view class="module-entries">
 					<view class="entry-btn" @tap="goTo('/pages/vote/vote')">
-						<text class="entry-icon">📝</text>
-						<text class="entry-label">{{ t('more.createDecision') }}</text>
-					</view>
-					<view class="entry-btn" @tap="goTo('/pages/vote/vote')">
-						<text class="entry-icon">📊</text>
-						<text class="entry-label">{{ t('more.viewDecision') }}</text>
+						<text class="entry-icon">🗳️</text>
+						<text class="entry-label">{{ t('more.decision') }}</text>
 					</view>
 				</view>
 			</view>
 
 			<view class="module-group">
-				<text class="module-title">📋 {{ t('more.task') }}</text>
+				<text class="module-title">📅 {{ t('more.task') }}</text>
 				<view class="module-entries">
 					<view class="entry-btn" @tap="goTo('/pages/schedule/schedule')">
-						<text class="entry-icon">➕</text>
-						<text class="entry-label">{{ t('more.createTask') }}</text>
-					</view>
-					<view class="entry-btn" @tap="goTo('/pages/schedule/schedule')">
 						<text class="entry-icon">📅</text>
-						<text class="entry-label">{{ t('more.viewTask') }}</text>
+						<text class="entry-label">{{ t('more.task') }}</text>
+					</view>
+				</view>
+			</view>
+
+			<view class="module-group">
+				<text class="module-title">💰 {{ t('more.finance') }}</text>
+				<view class="module-entries">
+					<view class="entry-btn" @tap="goTo('/pages/fee/fee')">
+						<text class="entry-icon">💰</text>
+						<text class="entry-label">{{ t('more.finance') }}</text>
+					</view>
+				</view>
+			</view>
+
+			<view class="module-group">
+				<text class="module-title">📢 {{ t('more.announcement') }}</text>
+				<view class="module-entries">
+					<view class="entry-btn" @tap="goTo('/pages/announce/announce')">
+						<text class="entry-icon">📢</text>
+						<text class="entry-label">{{ t('more.announceManage') }}</text>
 					</view>
 				</view>
 			</view>
@@ -40,47 +52,14 @@
 						<text class="entry-icon">🏆</text>
 						<text class="entry-label">{{ t('more.election') }}</text>
 					</view>
-					<view class="entry-btn" @tap="handleLeave">
-						<text class="entry-icon">🚪</text>
-						<text class="entry-label">{{ t('more.leave') }}</text>
-					</view>
 					<view class="entry-btn" @tap="goTo('/pages/invite/invite')">
 						<text class="entry-icon">✉️</text>
 						<text class="entry-label">{{ t('more.invite') }}</text>
 					</view>
-				</view>
-			</view>
-
-			<view class="module-group">
-				<text class="module-title">💰 {{ t('more.finance') }}</text>
-				<view class="module-entries">
-					<view class="entry-btn" @tap="goTo('/pages/fee/fee')">
-						<text class="entry-icon">💳</text>
-						<text class="entry-label">{{ t('more.createFee') }}</text>
+					<view class="entry-btn leave-btn" @tap="handleLeave">
+						<text class="entry-icon">🚪</text>
+						<text class="entry-label">{{ t('more.leave') }}</text>
 					</view>
-					<view class="entry-btn" @tap="goTo('/pages/fee/fee')">
-						<text class="entry-icon">📑</text>
-						<text class="entry-label">{{ t('more.viewRecord') }}</text>
-					</view>
-				</view>
-			</view>
-
-			<view class="module-group">
-				<text class="module-title">📢 {{ t('more.announcement') }}</text>
-				<view class="module-entries">
-					<view class="entry-btn" @tap="showNoticeEdit = true">
-						<text class="entry-icon">✏️</text>
-						<text class="entry-label">{{ t('more.editNotice') }}</text>
-					</view>
-				</view>
-			</view>
-
-			<!-- 公告编辑弹窗 -->
-			<view v-if="showNoticeEdit" class="modal-mask" @tap="showNoticeEdit = false">
-				<view class="modal-content" @tap.stop>
-					<view class="modal-title">{{ t('more.editNotice') }}</view>
-					<textarea class="notice-textarea" v-model="noticeText" :placeholder="t('more.noticePh')" />
-					<button class="btn-primary" @tap="saveNotice">{{ t('more.saveNotice') }}</button>
 				</view>
 			</view>
 		</view>
@@ -94,9 +73,6 @@ import { get, post, put } from '@/utils/request'
 import { t } from '@/utils/i18n'
 import { isDark, applyNavBarTheme } from '@/utils/theme'
 import { getLocalUserInfo, clearAuth } from '@/utils/auth'
-
-const showNoticeEdit = ref(false)
-const noticeText = ref('')
 
 const goTo = (url) => { uni.navigateTo({ url }) }
 
@@ -127,32 +103,9 @@ const handleLeave = () => {
 	})
 }
 
-const fetchNotice = async () => {
-	try {
-		const userInfo = getLocalUserInfo()
-		if (!userInfo.dormId) return
-		const res = await get(`/api/dorm/info?dormId=${userInfo.dormId}`)
-		if (res.code === 200 && res.data) noticeText.value = res.data.notice || ''
-	} catch (e) { console.error(e) }
-}
-
-const saveNotice = async () => {
-	try {
-		const userInfo = getLocalUserInfo()
-		const res = await put('/api/dorm/notice', { dormId: userInfo.dormId, notice: noticeText.value })
-		if (res.code === 200) {
-			uni.showToast({ title: t('more.noticeSaved'), icon: 'success' })
-			showNoticeEdit.value = false
-		} else {
-			uni.showToast({ title: res.msg, icon: 'none' })
-		}
-	} catch (e) { console.error(e) }
-}
-
 onShow(() => {
 	applyNavBarTheme()
 	uni.setNavigationBarTitle({ title: t('more.title') })
-	fetchNotice()
 })
 </script>
 
@@ -166,6 +119,7 @@ onShow(() => {
 .entry-btn:active { background-color: var(--bg-hover); }
 .entry-icon { font-size: 36rpx; }
 .entry-label { font-size: 28rpx; color: var(--text-primary); }
+.leave-btn .entry-label { color: #ff4d4f; }
 .modal-mask { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.4); z-index: 100; display: flex; align-items: center; justify-content: center; }
 .modal-content { background-color: var(--bg-card); width: 80%; border-radius: 16rpx; padding: 40rpx; }
 .modal-title { font-size: 32rpx; font-weight: bold; color: var(--text-primary); margin-bottom: 24rpx; }

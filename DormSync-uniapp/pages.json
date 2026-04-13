@@ -96,6 +96,12 @@
 			"style": {
 				"navigationBarTitleText": "用户须知"
 			}
+		},
+		{
+			"path": "pages/announce/announce",
+			"style": {
+				"navigationBarTitleText": "公告管理"
+			}
 		}
 	],
 	"globalStyle": {

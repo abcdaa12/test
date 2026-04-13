@@ -12,6 +12,7 @@ const { authMiddleware } = require('../middlewares/jwt')
 router.get('/list', authMiddleware, messageController.getMessageList)
 router.get('/unread-count', authMiddleware, messageController.getUnreadCount)
 router.put('/update', authMiddleware, messageController.updateMessage)
+router.put('/read-all', authMiddleware, messageController.markAllRead)
 
 // 搜索消息（需要鉴权）
 router.get('/search', authMiddleware, messageController.searchMessage)

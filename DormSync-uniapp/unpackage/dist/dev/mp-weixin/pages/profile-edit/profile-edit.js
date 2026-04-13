@@ -76,13 +76,20 @@ const _sfc_main = {
           });
           common_vendor.index.showToast({ title: utils_i18n.t("profile.saveSuccess"), icon: "success" });
           if (isFirstSetup.value) {
-            setTimeout(() => common_vendor.index.switchTab({ url: "/pages/index/index" }), 500);
+            setTimeout(() => {
+              const info2 = utils_auth.getLocalUserInfo();
+              if (!info2.dormId) {
+                common_vendor.index.redirectTo({ url: "/pages/dorm-setup/dorm-setup" });
+              } else {
+                common_vendor.index.switchTab({ url: "/pages/index/index" });
+              }
+            }, 500);
           } else {
             editing.value = false;
           }
         }
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/profile-edit/profile-edit.vue:126", "保存失败", e);
+        common_vendor.index.__f__("error", "at pages/profile-edit/profile-edit.vue:133", "保存失败", e);
         common_vendor.index.showToast({ title: utils_i18n.t("profile.saveFail"), icon: "none" });
       } finally {
         saving.value = false;

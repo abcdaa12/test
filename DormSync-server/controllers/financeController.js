@@ -4,9 +4,7 @@
  */
 const Finance = require('../models/Finance')
 const Dorm = require('../models/Dorm')
-const User = require('../models/User')
 const { createNotification } = require('./messageController')
-const { sendFinanceNotify } = require('../utils/wxSubscribe')
 
 /**
  * 发起收款
@@ -37,10 +35,6 @@ exports.createFinance = async (req, res, next) => {
                     type: 'finance',
                     content: `收款通知：${title} ¥${amount}`
                 })
-                // 微信推送
-                const users = await User.find({ _id: { $in: otherMembers } }, 'openid')
-                const openids = users.map(u => u.openid).filter(Boolean)
-                sendFinanceNotify(openids, title, amount).catch(e => console.error(e))
             }
         } catch (e) { console.error('发送财务通知失败', e) }
     } catch (err) {

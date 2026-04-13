@@ -5,7 +5,6 @@
 const Dorm = require('../models/Dorm')
 const User = require('../models/User')
 const { createNotification } = require('./messageController')
-const { sendDormActivity } = require('../utils/wxSubscribe')
 
 /**
  * 获取宿舍信息（宿舍号、公告）
@@ -89,12 +88,9 @@ exports.electLeader = async (req, res, next) => {
             const allMembers = dorm.members.map(id => id.toString())
             await createNotification({
                 userIds: allMembers,
-                type: 'task',
+                type: 'dorm',
                 content: `宿舍长已变更为 ${newLeader.nickname}`
             })
-            const users = await User.find({ _id: { $in: allMembers } }, 'openid')
-            const openids = users.map(u => u.openid).filter(Boolean)
-            sendDormActivity(openids, '宿舍长变更', `${newLeader.nickname} 成为新宿舍长`).catch(e => console.error(e))
         } catch (e) { console.error('选举通知失败', e) }
     } catch (err) {
         next(err)
@@ -131,12 +127,9 @@ exports.leaveDorm = async (req, res, next) => {
                 const remainIds = dorm.members.map(id => id.toString())
                 await createNotification({
                     userIds: remainIds,
-                    type: 'task',
+                    type: 'dorm',
                     content: `${leavingName} 已离开宿舍`
                 })
-                const users = await User.find({ _id: { $in: remainIds } }, 'openid')
-                const openids = users.map(u => u.openid).filter(Boolean)
-                sendDormActivity(openids, '成员退出', `${leavingName} 已离开宿舍`).catch(e => console.error(e))
             }
         } catch (e) { console.error('退出通知失败', e) }
     } catch (err) {
@@ -257,12 +250,9 @@ exports.joinDorm = async (req, res, next) => {
             if (existingMembers.length > 0) {
                 await createNotification({
                     userIds: existingMembers,
-                    type: 'task',
+                    type: 'dorm',
                     content: `${user.nickname} 加入了宿舍`
                 })
-                const users = await User.find({ _id: { $in: existingMembers } }, 'openid')
-                const openids = users.map(u => u.openid).filter(Boolean)
-                sendDormActivity(openids, '新成员加入', `${user.nickname} 加入了宿舍`).catch(e => console.error(e))
             }
         } catch (e) { console.error('加入通知失败', e) }
     } catch (err) {
@@ -294,12 +284,9 @@ exports.updateNotice = async (req, res, next) => {
             const memberIds = dorm.members.map(id => id.toString())
             await createNotification({
                 userIds: memberIds,
-                type: 'task',
+                type: 'announce',
                 content: `宿舍公告已更新：${(notice || '').slice(0, 30)}`
             })
-            const users = await User.find({ _id: { $in: memberIds } }, 'openid')
-            const openids = users.map(u => u.openid).filter(Boolean)
-            sendDormActivity(openids, '公告更新', (notice || '').slice(0, 20) || '公告已更新').catch(e => console.error(e))
         } catch (e) { console.error('公告通知失败', e) }
     } catch (err) {
         next(err)

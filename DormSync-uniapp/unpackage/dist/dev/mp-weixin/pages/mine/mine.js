@@ -23,7 +23,7 @@ const _sfc_main = {
         loadUserInfo();
         common_vendor.index.showToast({ title: utils_i18n.t("mine.loginSuccess"), icon: "success" });
       } catch (err) {
-        common_vendor.index.__f__("error", "at pages/mine/mine.vue:94", err);
+        common_vendor.index.__f__("error", "at pages/mine/mine.vue:89", err);
       }
     };
     const goProfile = () => {
@@ -31,9 +31,6 @@ const _sfc_main = {
         common_vendor.index.navigateTo({ url: "/pages/profile-edit/profile-edit" });
     };
     const goPage = (url) => common_vendor.index.navigateTo({ url });
-    const onTodo = () => {
-      common_vendor.index.showToast({ title: utils_i18n.t("mine.developing"), icon: "none" });
-    };
     const toggleDarkMode = () => {
       utils_theme.toggleDark();
       common_vendor.index.showToast({ title: utils_theme.isDark.value ? utils_i18n.t("mine.darkOn") : utils_i18n.t("mine.darkOff"), icon: "none" });
@@ -75,21 +72,19 @@ const _sfc_main = {
       } : {
         i: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.profile")),
         j: common_vendor.o(goProfile),
-        k: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.systemSetting")),
-        l: common_vendor.o(($event) => onTodo()),
-        m: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.language")),
-        n: common_vendor.o(($event) => goPage("/pages/language/language")),
-        o: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.darkMode")),
-        p: common_vendor.unref(utils_theme.isDark),
-        q: common_vendor.o(toggleDarkMode),
-        r: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.about")),
-        s: common_vendor.o(($event) => onTodo()),
-        t: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.terms")),
-        v: common_vendor.o(($event) => onTodo()),
-        w: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.logout")),
-        x: common_vendor.o(logout)
+        k: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.language")),
+        l: common_vendor.o(($event) => goPage("/pages/language/language")),
+        m: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.darkMode")),
+        n: common_vendor.unref(utils_theme.isDark),
+        o: common_vendor.o(toggleDarkMode),
+        p: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.about")),
+        q: common_vendor.o(($event) => goPage("/pages/about/about")),
+        r: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.terms")),
+        s: common_vendor.o(($event) => goPage("/pages/terms/terms")),
+        t: common_vendor.t(common_vendor.unref(utils_i18n.t)("mine.logout")),
+        v: common_vendor.o(logout)
       }, {
-        y: common_vendor.n(common_vendor.unref(utils_theme.isDark) ? "dark-mode" : "")
+        w: common_vendor.n(common_vendor.unref(utils_theme.isDark) ? "dark-mode" : "")
       });
     };
   }

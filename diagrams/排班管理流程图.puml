@@ -1,0 +1,81 @@
+@startuml
+skinparam activity {
+  FontSize 13
+  BackgroundColor #F5F5F5
+  BorderColor #333333
+  DiamondBackgroundColor #FFFDE7
+  DiamondBorderColor #333333
+}
+
+start
+
+if (排班方式？) then (手动排班)
+
+  :点击日历格子;
+
+  :弹出详情弹窗\n显示成员列表;
+
+  if (选择操作？) then (指定值日人)
+    :更新该日排班数据\n日历格子显示姓名;
+  else (清除排班)
+    :移除该日排班记录\n日历格子恢复空白;
+  endif
+
+  :用户点击保存按钮;
+
+  :前端提交排班数据至后端\nPOST /api/schedule/create;
+
+  :后端创建排班文档\n存储至 Schedule 集合;
+
+  :返回保存成功响应;
+
+  if (排班中是否包含明天？) then (是)
+    :异步向明天值日人员\n发送值日提醒通知;
+  else (否)
+  endif
+
+  :前端提示"排班保存成功";
+
+  stop
+
+else (AI智能排班)
+
+  :用户输入自然语言排班需求\n(如"周末不排班，工作日轮流");
+
+  :前端提交至后端\nPOST /api/schedule/ai-generate;
+
+  :后端查询宿舍成员列表;
+
+  :构造结构化系统提示词\n(成员名单+日期范围+排班规则);
+
+  :调用 DeepSeek 大模型\nchat/completions 接口;
+
+  if (AI返回是否成功？) then (否)
+    :提示"AI排班失败，请稍后重试";
+    stop
+  else (是)
+  endif
+
+  :解析AI返回的JSON排班数据;
+
+  :将成员姓名映射为用户ID;
+
+  :返回排班方案给前端;
+
+  :日历以橙色预览显示\nAI生成的排班;
+
+  :用户可手动微调预览结果;
+
+  if (用户是否确认保存？) then (否)
+    :点击放弃，清除预览;
+    stop
+  else (是)
+    :提交保存排班数据;
+    :存储至 Schedule 集合;
+    :前端提示"排班保存成功";
+    stop
+  endif
+
+endif
+
+@enduml
