@@ -34,15 +34,15 @@
 }
 .dark-mode .day-cell.has-duty.data-v-e6e5e79f { background-color: #1a2a1a;
 }
-.day-cell.preview-duty.data-v-e6e5e79f { background-color: #fff3e0;
+.day-cell.preview-duty.data-v-e6e5e79f { background-color: #f1f8e9;
 }
-.dark-mode .day-cell.preview-duty.data-v-e6e5e79f { background-color: #2a2000;
+.dark-mode .day-cell.preview-duty.data-v-e6e5e79f { background-color: #1a2a1a;
 }
 .day-num.data-v-e6e5e79f { font-size: 24rpx; color: var(--text-primary);
 }
 .day-person.data-v-e6e5e79f { font-size: 18rpx; color: var(--color-primary); margin-top: 4rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 90rpx;
 }
-.preview-text.data-v-e6e5e79f { color: #e65100;
+.preview-text.data-v-e6e5e79f { color: var(--color-primary);
 }
 
 /* AI 区域 */

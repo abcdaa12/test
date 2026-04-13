@@ -300,11 +300,11 @@ onShow(() => {
 .dark-mode .day-cell.today { background-color: #0d47a1; }
 .day-cell.has-duty { background-color: #f1f8e9; }
 .dark-mode .day-cell.has-duty { background-color: #1a2a1a; }
-.day-cell.preview-duty { background-color: #fff3e0; }
-.dark-mode .day-cell.preview-duty { background-color: #2a2000; }
+.day-cell.preview-duty { background-color: #f1f8e9; }
+.dark-mode .day-cell.preview-duty { background-color: #1a2a1a; }
 .day-num { font-size: 24rpx; color: var(--text-primary); }
 .day-person { font-size: 18rpx; color: var(--color-primary); margin-top: 4rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 90rpx; }
-.preview-text { color: #e65100; }
+.preview-text { color: var(--color-primary); }
 
 /* AI 区域 */
 .ai-section { margin-top: 32rpx; background: var(--bg-card); border-radius: 16rpx; padding: 28rpx 24rpx; }
