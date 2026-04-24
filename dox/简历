@@ -1,0 +1,157 @@
+# 杨雅茹 - 前端开发工程师
+
+::: left
+
+26届毕业生 | 河南科技学院 | 计算机科学与技术 | 本科一批 
+
+icon:csdn [https://blog.csdn.net/m0_74065758](https://blog.csdn.net/m0_74065758)
+
+[icon:email 2997342346@qq.com](mailto:2997342346@qq.com)
+
+
+
+icon:phone 13137732519
+
+:::
+
+::: right
+
+:::
+
+## 专业技能
+
+- 熟练掌握 HTML/CSS/JS/TS，深刻理解 TypeScript 类型系统与泛型约束；熟练运用常见组件库（Naive UI、AntDesign 等）高效交付业务需求
+- 熟练掌握 React、Vue核心原理及开发模式；深入理解前端复杂状态管理，熟练运用 Zustand、Pinia 等工具处理高频实时数据流（如 WebSocket 消息队列）及复杂全局状态
+- 熟练掌握跨端开发体系，具备 Taro / uni-app 在千万级 DAU 业务中的落地经验，深入理解微信、支付宝等多端环境下的文件级编译隔离、组件降级策略及分包优化
+- 熟悉 Webpack/Vite 等构建工具体系，熟练运用 Prefetch（路由级预取）、懒加载（IntersectionObserver）及相关监控指标（LCP/FID）进行首屏极限性能调优
+- 熟悉 Next.js 服务端渲染体系及水合机制，具备系统级前端 SEO 调优经验；熟练掌握 HTTP/HTTPS、TCP/UDP、SSE、WebSocket 等实时与流式通信机制的落地与异常处理
+- 具备良好的 AI 工程化素养，熟悉大模型辅助研发提效（如 AI Skill 训练与定制）；了解 LangGraph 等多智能体协作框架，有独立搭建 AI 工作流辅助工具链及黑客松极限交付经验
+- 熟练使用 Git 管理代码，理解 GitFlow 工作流与企业级分支、提交规范，具备协同开发及 Code Review 经验
+
+
+## 实习经历
+
+
+:::left
+<span style = 'color:black;font-weight: 700; margin-right:5px'>哈啰出行--前端开发工程师</span>
+:::
+:::right
+<span style = 'color:black;font-weight: 700; margin-right:5px'>2025.12-至今</span>
+:::
+
+- <span style = 'color:black;font-weight: 700; margin-right:5px'>业务开发:</span>参与哈啰SaaS多端核心系统（微信/支付宝小程序、H5）的日常需求迭代
+- <span style = 'color:black;font-weight: 700; margin-right:5px'>跨端组件适配:</span>参与完善跨平台组件，处理不同环境（微信、支付宝、App）下的样式兼容与API降级问题
+- <span style = 'color:black;font-weight: 700; margin-right:5px'>性能与体验优化:</span>运用 IntersectionObserver 配合现有框架实现复杂组件的视口懒加载；参与排查并修复多端环境下的渲染异常与高频交互Bug
+- <span style = 'color:black;font-weight: 700; margin-right:5px'>AI 工具链建设:</span>参与内部 AI Skill 生态建设，主导训练并优化了代码审查（Code Review）专属 Skill，显著提升了团队内部 CR 效率与代码规范自动检测能力
+- <span style = 'color:black;font-weight: 700; margin-right:5px'>内部 Hackathon:</span>参与哈啰与 Kiro 联合举办的 48 小时极限 AI 创新大赛，在极短时间内完成随机抽题的分析与技术选型，并成功交付基于大模型的完整前台 Demo
+:::left
+<span style = 'color:black;font-weight: 700; margin-right:5px'>搜狐畅游--前端开发工程师</span>
+:::
+:::right
+<span style = 'color:black;font-weight: 700; margin-right:5px'>2025.7-2025.10</span>
+:::
+
+- <span style = 'color:black;font-weight: 700; margin-right:5px'>项目开发:</span>参与了YAgent、DeerFlow、畅游Agent项目的开发，负责了一些核心模块的完善和新功能的开发
+- <span style = 'color:black;font-weight: 700; margin-right:5px'>性能优化:</span>通过LCP、FID、减少请求、懒加载、Intersection Observer API等方法提高响应速度
+- <span style = 'color:black;font-weight: 700; margin-right:5px'>需求分析:</span>参与项目的需求分析和调研并参与功能测试
+- <span style = 'color:black;font-weight: 700; margin-right:5px'>开发规范实践:</span>采用 TypeScript+Zustand 实现 deerflow RAG 项目全局状态管理，基于 React、Next.js 技术栈保障代码质量
+- <span style = 'color:black;font-weight: 700; margin-right:5px'>交互体验升级:</span>构建聊天界面智能滚动逻辑，格式化对话内容，提升可读性，优化关键页面交互流程
+:::left
+### 红课科技--前端开发工程师
+:::
+:::right
+
+<span style="font-weight:700">2025.5-2025.7</span>
+:::
+- <span style = 'color:black;font-weight: 700; margin-right:5px'>项目全周期开发:</span>参与中小学智慧图书馆需求分析会，并负责小程序首页和Web端图书相关页核心功能的开发
+- <span style = 'color:black;font-weight: 700; margin-right:5px'>开发规范:</span>基于ESLint、Prettier对代码进行规范、基于gitlab+codereview把控代码质量
+- <span style = 'color:black;font-weight: 700; margin-right:5px'>需求分析:</span>参与项目的需求分析和调研并参与功能测试
+- <span style = 'color:black;font-weight: 700; margin-right:5px'>Bug 修复与性能优化实操:</span>修复Bug并通过防抖节流等技术优化性能，提升用户体验
+
+
+
+## 项目经历
+
+:::left
+<span style = 'color:black;font-weight: 700; margin-right:5px'>哈啰出行 SaaS 核心业务系统（微信/支付宝/H5多端）</span>
+:::
+:::right
+2025.12-至今
+:::
+<span style = 'color:black;font-weight: 700; margin-right:5px'>技术栈:</span> `React` `Taro` `TypeScript` `Zustand` `Webpack`
+
+<span style = 'color:black;font-weight: 700; margin-right:5px'>项目描述:</span>
+
+支撑哈啰海量用户的共享出行核心业务，采用一套 SaaS 代码库同时承接主品牌与多个独立租户（小品牌），全面覆盖微信/支付宝小程序及 App 内嵌 H5 的复杂跨端工程。
+
+<span style = 'color:black;font-weight: 700; margin-right:5px'>业务职责:</span>
+
+-  配合团队打通前后端生命周期边界，在组件内精准消费 HTML 解析期发起的并行预取（Prefetch）数据，通过 Promise 桥接使网络请求与 JS 解析时间完全重叠，极限压缩首屏白屏时间
+-  运用 Zustand 配合 `Map` 结构的消息队列，处理骑行中高频的 WebSocket 实时推送。通过“生产-消费”模型彻底解决弱网环境下车锁状态更新的时序错乱与竞态问题
+-  熟练运用基于 Webpack 插件的文件后缀级编译架构（如 `.h5.ts` / `.mini.ts`），实现不同端/不同品牌的代码硬隔离；运用 ES6 Proxy 模式处理 Native Bridge 的透明代理与降级
+-  参与核心链路的异常处理体系建设，运用 `Promise.race` 控制定位 SDK 的竞速超时，并制定合理的业务兜底策略（如偏远地区默认定位），保障线上极高可用性
+
+
+:::left
+<span style = 'color:black;font-weight: 700; margin-right:5px'>YAgent</span>
+:::
+:::right
+2025.7-2025.10
+:::
+<span style = 'color:black;font-weight: 700; margin-right:5px'>技术栈:</span>`LangGraph ` `JavaScript` `Socket.IO` `MCP`  `ChromaDB` `Unity WebGL`
+<span style = 'color:black;font-weight: 700; margin-right:5px'>项目描述:</span>
+
+YAgent 是一个基于 LangGraph 框架构建的智能代理系统，专注于游戏开发和AI辅助工作流管理。该系统通过创新的状态图工作流引擎，实现了多智能体协作、动态任务编排和实时交互的完整解决方案，为复杂的游戏开发流程提供全方位的AI辅助支持。
+
+<span style = 'color:black;font-weight: 700; margin-right:5px'>业务职责:</span>
+
+
+- 实现智能体对话的自动分类和路由分发，提升对话处理效率300%
+- 实现对话数据管理功能 ，支持JSON格式的结构化导入导出，包含消息内容、时间戳、Token统计等完整元数据，为数据分析和模型训练提供高质量数据源
+
+- 通过用户行为分析自动判断滚动意图，避免强制滚动打断用户阅读，同时提供流畅的回到底部交互，显著改善长对话场景的用户体验
+- 实现一键重启服务器功能，集成冷却保护机制、进程依赖管理和健康检查，支持多服务批量重启
+- 开发智能化异常处理功能 ，实现工作流中断的自动检测与恢复，通过模态交互提供停止、继续、重试等操作选项，将异常处理成功率提升至95%
+- 构建动态团队管理平台 ，支持团队创建、权限分配、实时切换等功能，通过交互式UI组件实现团队数据的实时同步，提升多人协作效率50%
+- 基于Watchdog + Socket.IO设计文件监控系统 ，实现毫秒级的文件变更检测和实时数据推送
+
+:::left
+<span style = 'color:black;font-weight: 700; margin-right:5px'>DeerFlow RAG</span>
+:::
+:::right
+2025.7-2025.10
+:::
+<span style = 'color:black;font-weight: 700; margin-right:5px'>技术栈:</span> `LangGraph ` `TypeScript` `React` `Next.js` `Zustand` `Tailwind CSS` 
+
+<span style = 'color:black;font-weight: 700; margin-right:5px'>项目描述:</span>
+
+DeerFlow RAG是一个基于 LangGraph 框架构建的智能深度研究系统，专注于信息收集和AI辅助内容生成工作流管理。该系统通过创新的多智能体协作架构，实现了自动化研究、动态工作流编排和多模态内容输出的完整解决方案，为复杂的研究分析流程提供全方位的AI辅助支持。
+
+<span style = 'color:black;font-weight: 700; margin-right:5px'>业务职责:</span>
+
+- 基于SSE实现流式通信，支持多卡片同时流式回显
+- 基于Marked、Mermaid库深度定制，集成代码语法高亮、数学公式渲染、表格优化、角标跳转等功能，将用户阅读体验提升40%，支持20+编程语言高亮显示
+- 自定义封装通用组件15+，抽取公共逻辑封装，代码量减少40%，开发效率提升40%
+- 基于Zustand构建轻量级全局状态管理架构，性能提升40%
+- 基于RBAC创建权限系统，创建全局路由守卫
+- 系统性优化前端性能 ，通过LCP、FID、减少请求、懒加载等方法将页面首屏加载时间优化至1.2秒，交互响应时间控制在100ms以内
+
+
+
+:::left
+### 中小学智慧图书馆(Web+uni-app)
+:::
+:::right
+<span style="font-weight:700">2025.6-2025.7</span>
+
+:::
+
+
+<span style = 'color:black;font-weight: 700; margin-right:5px'>技术栈:</span>` Vue3 `  `TypeScript` `AntDesign`  `Pinia` `uni-app` `Vite`
+<span style = 'color:black;font-weight: 700; margin-right:5px'>项目描述:</span>
+整合全区中小学阅读资源的统借统还流转服务系统，包含图书借阅、权限控制、多租户审批等，打通区域阅读服务的“最后一公里”。
+
+<span style = 'color:black;font-weight: 700; margin-right:5px'>业务职责:</span>
+- 担任前端项目负责人，基于 Vue 3 + Vite + Pinia 搭建高性能 Web 端框架，主导项目进度把控与 ESLint + Prettier 代码审查
+- 基于 uni.request 封装支持 Promise 及拦截器的多端兼容 HTTP 请求模块；运用 rem/vw 及媒体查询实现多分辨率自适应布局
+- 基于 Jenkins 与 Webhook 建立小程序自动化部署流，并独立完成微信登录验证及验证码海报生成等核心功能
