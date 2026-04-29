@@ -1,0 +1,276 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1475pt" height="570pt" viewBox="0.00 0.00 1475.00 570.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 565.6)">
+<title>Global_ER_Diagram</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-565.6 1470.8,-565.6 1470.8,4 -4,4"/>
+<!-- Dorm -->
+<g id="node1" class="node">
+<title>Dorm</title>
+<polygon fill="#dae8fc" stroke="#6c8ebf" points="1022.8,-561.6 922,-561.6 922,-518.4 1022.8,-518.4 1022.8,-561.6"/>
+<text xml:space="preserve" text-anchor="middle" x="972.4" y="-535.8" font-family="SimHei, Arial, sans-serif" font-size="14.00">宿舍</text>
+</g>
+<!-- R_Belong -->
+<g id="node10" class="node">
+<title>R_Belong</title>
+<polygon fill="#fff2cc" stroke="#d6b656" points="662.4,-432 612,-410.4 662.4,-388.8 712.8,-410.4 662.4,-432"/>
+<text xml:space="preserve" text-anchor="middle" x="662.4" y="-406.8" font-family="SimHei, Arial, sans-serif" font-size="12.00">包含</text>
+</g>
+<!-- Dorm&#45;&#45;R_Belong -->
+<g id="edge1" class="edge">
+<title>Dorm--R_Belong</title>
+<path fill="none" stroke="black" d="M921.56,-518.07C854.22,-490.36 738.08,-442.55 687.34,-421.66"/>
+<text xml:space="preserve" text-anchor="middle" x="829.7" y="-471.6" font-family="SimHei, Arial, sans-serif" font-size="12.00">1</text>
+</g>
+<!-- R_DormTask -->
+<g id="node11" class="node">
+<title>R_DormTask</title>
+<polygon fill="#fff2cc" stroke="#d6b656" points="1414.4,-432 1364,-410.4 1414.4,-388.8 1464.8,-410.4 1414.4,-432"/>
+<text xml:space="preserve" text-anchor="middle" x="1414.4" y="-406.8" font-family="SimHei, Arial, sans-serif" font-size="12.00">包含</text>
+</g>
+<!-- Dorm&#45;&#45;R_DormTask -->
+<g id="edge3" class="edge">
+<title>Dorm--R_DormTask</title>
+<path fill="none" stroke="black" d="M1023.1,-524.36C1116.07,-497.52 1311.07,-441.23 1385.07,-419.87"/>
+<text xml:space="preserve" text-anchor="middle" x="1209.65" y="-471.6" font-family="SimHei, Arial, sans-serif" font-size="12.00">1</text>
+</g>
+<!-- R_DormFin -->
+<g id="node12" class="node">
+<title>R_DormFin</title>
+<polygon fill="#fff2cc" stroke="#d6b656" points="189.4,-432 139,-410.4 189.4,-388.8 239.8,-410.4 189.4,-432"/>
+<text xml:space="preserve" text-anchor="middle" x="189.4" y="-406.8" font-family="SimHei, Arial, sans-serif" font-size="12.00">产生</text>
+</g>
+<!-- Dorm&#45;&#45;R_DormFin -->
+<g id="edge5" class="edge">
+<title>Dorm--R_DormFin</title>
+<path fill="none" stroke="black" d="M921.63,-530.73C774.55,-506.76 350.69,-437.69 224.96,-417.2"/>
+<text xml:space="preserve" text-anchor="middle" x="607.38" y="-471.6" font-family="SimHei, Arial, sans-serif" font-size="12.00">1</text>
+</g>
+<!-- R_DormDec -->
+<g id="node13" class="node">
+<title>R_DormDec</title>
+<polygon fill="#fff2cc" stroke="#d6b656" points="1251.4,-432 1201,-410.4 1251.4,-388.8 1301.8,-410.4 1251.4,-432"/>
+<text xml:space="preserve" text-anchor="middle" x="1251.4" y="-406.8" font-family="SimHei, Arial, sans-serif" font-size="12.00">具有</text>
+</g>
+<!-- Dorm&#45;&#45;R_DormDec -->
+<g id="edge7" class="edge">
+<title>Dorm--R_DormDec</title>
+<path fill="none" stroke="black" d="M1018.47,-517.93C1078.52,-490.46 1181.33,-443.45 1227.6,-422.29"/>
+<text xml:space="preserve" text-anchor="middle" x="1123.27" y="-471.6" font-family="SimHei, Arial, sans-serif" font-size="12.00">1</text>
+</g>
+<!-- R_DormSch -->
+<g id="node14" class="node">
+<title>R_DormSch</title>
+<polygon fill="#fff2cc" stroke="#d6b656" points="1083.4,-432 1033,-410.4 1083.4,-388.8 1133.8,-410.4 1083.4,-432"/>
+<text xml:space="preserve" text-anchor="middle" x="1083.4" y="-406.8" font-family="SimHei, Arial, sans-serif" font-size="12.00">安排</text>
+</g>
+<!-- Dorm&#45;&#45;R_DormSch -->
+<g id="edge9" class="edge">
+<title>Dorm--R_DormSch</title>
+<path fill="none" stroke="black" d="M990.73,-517.93C1013.14,-492.16 1050.53,-449.19 1070.27,-426.5"/>
+<text xml:space="preserve" text-anchor="middle" x="1034.23" y="-471.6" font-family="SimHei, Arial, sans-serif" font-size="12.00">1</text>
+</g>
+<!-- R_DormAnn -->
+<g id="node15" class="node">
+<title>R_DormAnn</title>
+<polygon fill="#fff2cc" stroke="#d6b656" points="907.4,-432 857,-410.4 907.4,-388.8 957.8,-410.4 907.4,-432"/>
+<text xml:space="preserve" text-anchor="middle" x="907.4" y="-406.8" font-family="SimHei, Arial, sans-serif" font-size="12.00">发布</text>
+</g>
+<!-- Dorm&#45;&#45;R_DormAnn -->
+<g id="edge11" class="edge">
+<title>Dorm--R_DormAnn</title>
+<path fill="none" stroke="black" d="M961.67,-517.93C948.9,-492.87 927.85,-451.54 916.07,-428.41"/>
+<text xml:space="preserve" text-anchor="middle" x="944.85" y="-471.6" font-family="SimHei, Arial, sans-serif" font-size="12.00">1</text>
+</g>
+<!-- User -->
+<g id="node2" class="node">
+<title>User</title>
+<polygon fill="#dae8fc" stroke="#6c8ebf" points="657.8,-302.4 557,-302.4 557,-259.2 657.8,-259.2 657.8,-302.4"/>
+<text xml:space="preserve" text-anchor="middle" x="607.4" y="-276.6" font-family="SimHei, Arial, sans-serif" font-size="14.00">用户</text>
+</g>
+<!-- R_UserFin -->
+<g id="node16" class="node">
+<title>R_UserFin</title>
+<polygon fill="#fff2cc" stroke="#d6b656" points="130.4,-172.8 80,-151.2 130.4,-129.6 180.8,-151.2 130.4,-172.8"/>
+<text xml:space="preserve" text-anchor="middle" x="130.4" y="-147.6" font-family="SimHei, Arial, sans-serif" font-size="12.00">发起</text>
+</g>
+<!-- User&#45;&#45;R_UserFin -->
+<g id="edge13" class="edge">
+<title>User--R_UserFin</title>
+<path fill="none" stroke="black" d="M556.8,-266.27C457.66,-239.74 240.54,-181.66 160.66,-160.3"/>
+<text xml:space="preserve" text-anchor="middle" x="386.2" y="-212.4" font-family="SimHei, Arial, sans-serif" font-size="12.00">1</text>
+</g>
+<!-- R_UserDec -->
+<g id="node17" class="node">
+<title>R_UserDec</title>
+<polygon fill="#fff2cc" stroke="#d6b656" points="1042.4,-172.8 992,-151.2 1042.4,-129.6 1092.8,-151.2 1042.4,-172.8"/>
+<text xml:space="preserve" text-anchor="middle" x="1042.4" y="-147.6" font-family="SimHei, Arial, sans-serif" font-size="12.00">参与</text>
+</g>
+<!-- User&#45;&#45;R_UserDec -->
+<g id="edge15" class="edge">
+<title>User--R_UserDec</title>
+<path fill="none" stroke="black" d="M658.3,-276.72C722.78,-271.51 836.46,-257.86 927.4,-223.2 964.89,-208.91 1003.61,-182.03 1025.18,-165.76"/>
+<text xml:space="preserve" text-anchor="middle" x="960.62" y="-212.4" font-family="SimHei, Arial, sans-serif" font-size="12.00">1</text>
+</g>
+<!-- R_UserSch -->
+<g id="node18" class="node">
+<title>R_UserSch</title>
+<polygon fill="#fff2cc" stroke="#d6b656" points="766.4,-172.8 716,-151.2 766.4,-129.6 816.8,-151.2 766.4,-172.8"/>
+<text xml:space="preserve" text-anchor="middle" x="766.4" y="-147.6" font-family="SimHei, Arial, sans-serif" font-size="12.00">执行</text>
+</g>
+<!-- User&#45;&#45;R_UserSch -->
+<g id="edge17" class="edge">
+<title>User--R_UserSch</title>
+<path fill="none" stroke="black" d="M633.66,-258.73C666.47,-232.4 721.67,-188.09 749.41,-165.83"/>
+<text xml:space="preserve" text-anchor="middle" x="694.67" y="-212.4" font-family="SimHei, Arial, sans-serif" font-size="12.00">1</text>
+</g>
+<!-- R_UserAnn -->
+<g id="node19" class="node">
+<title>R_UserAnn</title>
+<polygon fill="#fff2cc" stroke="#d6b656" points="607.4,-172.8 557,-151.2 607.4,-129.6 657.8,-151.2 607.4,-172.8"/>
+<text xml:space="preserve" text-anchor="middle" x="607.4" y="-147.6" font-family="SimHei, Arial, sans-serif" font-size="12.00">撰写</text>
+</g>
+<!-- User&#45;&#45;R_UserAnn -->
+<g id="edge19" class="edge">
+<title>User--R_UserAnn</title>
+<path fill="none" stroke="black" d="M607.4,-258.73C607.4,-235.09 607.4,-196.96 607.4,-173.3"/>
+<text xml:space="preserve" text-anchor="middle" x="610.4" y="-212.4" font-family="SimHei, Arial, sans-serif" font-size="12.00">1</text>
+</g>
+<!-- R_UserTodo -->
+<g id="node20" class="node">
+<title>R_UserTodo</title>
+<polygon fill="#fff2cc" stroke="#d6b656" points="289.4,-172.8 239,-151.2 289.4,-129.6 339.8,-151.2 289.4,-172.8"/>
+<text xml:space="preserve" text-anchor="middle" x="289.4" y="-147.6" font-family="SimHei, Arial, sans-serif" font-size="12.00">拥有</text>
+</g>
+<!-- User&#45;&#45;R_UserTodo -->
+<g id="edge21" class="edge">
+<title>User--R_UserTodo</title>
+<path fill="none" stroke="black" d="M556.66,-259.44C487.75,-231.79 367.16,-183.4 314.83,-162.41"/>
+<text xml:space="preserve" text-anchor="middle" x="460.93" y="-212.4" font-family="SimHei, Arial, sans-serif" font-size="12.00">1</text>
+</g>
+<!-- R_UserMsg -->
+<g id="node21" class="node">
+<title>R_UserMsg</title>
+<polygon fill="#fff2cc" stroke="#d6b656" points="448.4,-172.8 398,-151.2 448.4,-129.6 498.8,-151.2 448.4,-172.8"/>
+<text xml:space="preserve" text-anchor="middle" x="448.4" y="-147.6" font-family="SimHei, Arial, sans-serif" font-size="12.00">接收</text>
+</g>
+<!-- User&#45;&#45;R_UserMsg -->
+<g id="edge23" class="edge">
+<title>User--R_UserMsg</title>
+<path fill="none" stroke="black" d="M581.14,-258.73C548.33,-232.4 493.13,-188.09 465.39,-165.83"/>
+<text xml:space="preserve" text-anchor="middle" x="535.67" y="-212.4" font-family="SimHei, Arial, sans-serif" font-size="12.00">1</text>
+</g>
+<!-- Todo -->
+<g id="node3" class="node">
+<title>Todo</title>
+<polygon fill="#dae8fc" stroke="#6c8ebf" points="339.8,-43.2 239,-43.2 239,0 339.8,0 339.8,-43.2"/>
+<text xml:space="preserve" text-anchor="middle" x="289.4" y="-17.4" font-family="SimHei, Arial, sans-serif" font-size="14.00">待办事项</text>
+</g>
+<!-- Finance -->
+<g id="node4" class="node">
+<title>Finance</title>
+<polygon fill="#dae8fc" stroke="#6c8ebf" points="100.8,-43.2 0,-43.2 0,0 100.8,0 100.8,-43.2"/>
+<text xml:space="preserve" text-anchor="middle" x="50.4" y="-17.4" font-family="SimHei, Arial, sans-serif" font-size="14.00">财务记录</text>
+</g>
+<!-- Decision -->
+<g id="node5" class="node">
+<title>Decision</title>
+<polygon fill="#dae8fc" stroke="#6c8ebf" points="1200.8,-43.2 1100,-43.2 1100,0 1200.8,0 1200.8,-43.2"/>
+<text xml:space="preserve" text-anchor="middle" x="1150.4" y="-17.4" font-family="SimHei, Arial, sans-serif" font-size="14.00">投票决策</text>
+</g>
+<!-- Task -->
+<g id="node6" class="node">
+<title>Task</title>
+<polygon fill="#dae8fc" stroke="#6c8ebf" points="1466.8,-43.2 1366,-43.2 1366,0 1466.8,0 1466.8,-43.2"/>
+<text xml:space="preserve" text-anchor="middle" x="1416.4" y="-17.4" font-family="SimHei, Arial, sans-serif" font-size="14.00">事务</text>
+</g>
+<!-- Schedule -->
+<g id="node7" class="node">
+<title>Schedule</title>
+<polygon fill="#dae8fc" stroke="#6c8ebf" points="975.8,-43.2 875,-43.2 875,0 975.8,0 975.8,-43.2"/>
+<text xml:space="preserve" text-anchor="middle" x="925.4" y="-17.4" font-family="SimHei, Arial, sans-serif" font-size="14.00">排班</text>
+</g>
+<!-- Message -->
+<g id="node8" class="node">
+<title>Message</title>
+<polygon fill="#dae8fc" stroke="#6c8ebf" points="498.8,-43.2 398,-43.2 398,0 498.8,0 498.8,-43.2"/>
+<text xml:space="preserve" text-anchor="middle" x="448.4" y="-17.4" font-family="SimHei, Arial, sans-serif" font-size="14.00">消息</text>
+</g>
+<!-- Announce -->
+<g id="node9" class="node">
+<title>Announce</title>
+<polygon fill="#dae8fc" stroke="#6c8ebf" points="700.8,-43.2 600,-43.2 600,0 700.8,0 700.8,-43.2"/>
+<text xml:space="preserve" text-anchor="middle" x="650.4" y="-17.4" font-family="SimHei, Arial, sans-serif" font-size="14.00">公告</text>
+</g>
+<!-- R_Belong&#45;&#45;User -->
+<g id="edge2" class="edge">
+<title>R_Belong--User</title>
+<path fill="none" stroke="black" d="M654.75,-391.66C644.72,-368.38 627.13,-327.57 616.44,-302.78"/>
+<text xml:space="preserve" text-anchor="middle" x="640.88" y="-342" font-family="SimHei, Arial, sans-serif" font-size="12.00">N</text>
+</g>
+<!-- R_DormTask&#45;&#45;Task -->
+<g id="edge4" class="edge">
+<title>R_DormTask--Task</title>
+<path fill="none" stroke="black" d="M1414.51,-388.33C1414.86,-320.86 1415.94,-110.62 1416.29,-43.45"/>
+<text xml:space="preserve" text-anchor="middle" x="1419.76" y="-212.4" font-family="SimHei, Arial, sans-serif" font-size="12.00">N</text>
+</g>
+<!-- R_DormFin&#45;&#45;Finance -->
+<g id="edge6" class="edge">
+<title>R_DormFin--Finance</title>
+<path fill="none" stroke="black" d="M176.52,-394.1C147.32,-358.27 76.65,-264.99 51.4,-172.8 39.14,-128.03 43.44,-72.9 47.21,-43.47"/>
+<text xml:space="preserve" text-anchor="middle" x="72.85" y="-212.4" font-family="SimHei, Arial, sans-serif" font-size="12.00">N</text>
+</g>
+<!-- R_DormDec&#45;&#45;Decision -->
+<g id="edge8" class="edge">
+<title>R_DormDec--Decision</title>
+<path fill="none" stroke="black" d="M1254.95,-390C1263.72,-336.56 1281.73,-184.21 1224.4,-79.2 1216.49,-64.72 1203.14,-52.79 1189.94,-43.68"/>
+<text xml:space="preserve" text-anchor="middle" x="1267" y="-212.4" font-family="SimHei, Arial, sans-serif" font-size="12.00">N</text>
+</g>
+<!-- R_DormSch&#45;&#45;Schedule -->
+<g id="edge10" class="edge">
+<title>R_DormSch--Schedule</title>
+<path fill="none" stroke="black" d="M1092.79,-392.53C1120.61,-340.02 1196.2,-177.18 1122.4,-79.2 1104.79,-55.82 1028.47,-39.12 976.16,-30.16"/>
+<text xml:space="preserve" text-anchor="middle" x="1156.97" y="-212.4" font-family="SimHei, Arial, sans-serif" font-size="12.00">N</text>
+</g>
+<!-- R_DormAnn&#45;&#45;Announce -->
+<g id="edge12" class="edge">
+<title>R_DormAnn--Announce</title>
+<path fill="none" stroke="black" d="M908.02,-388.96C909.54,-324.3 910.79,-125.69 870.4,-79.2 848.48,-53.97 759.14,-37.34 701.27,-28.98"/>
+<text xml:space="preserve" text-anchor="middle" x="908.95" y="-212.4" font-family="SimHei, Arial, sans-serif" font-size="12.00">N</text>
+</g>
+<!-- R_UserFin&#45;&#45;Finance -->
+<g id="edge14" class="edge">
+<title>R_UserFin--Finance</title>
+<path fill="none" stroke="black" d="M120.11,-133.78C105.67,-110.76 79.42,-68.89 63.58,-43.62"/>
+<text xml:space="preserve" text-anchor="middle" x="97.13" y="-82.8" font-family="SimHei, Arial, sans-serif" font-size="12.00">N</text>
+</g>
+<!-- R_UserDec&#45;&#45;Decision -->
+<g id="edge16" class="edge">
+<title>R_UserDec--Decision</title>
+<path fill="none" stroke="black" d="M1055.43,-134.81C1074.73,-112.01 1110.96,-69.19 1132.67,-43.55"/>
+<text xml:space="preserve" text-anchor="middle" x="1103.97" y="-82.8" font-family="SimHei, Arial, sans-serif" font-size="12.00">N</text>
+</g>
+<!-- R_UserSch&#45;&#45;Schedule -->
+<g id="edge18" class="edge">
+<title>R_UserSch--Schedule</title>
+<path fill="none" stroke="black" d="M783.42,-136.54C811.21,-114.24 866.55,-69.83 899.33,-43.52"/>
+<text xml:space="preserve" text-anchor="middle" x="855" y="-82.8" font-family="SimHei, Arial, sans-serif" font-size="12.00">N</text>
+</g>
+<!-- R_UserAnn&#45;&#45;Announce -->
+<g id="edge20" class="edge">
+<title>R_UserAnn--Announce</title>
+<path fill="none" stroke="black" d="M613.56,-131.92C621.46,-108.49 635.11,-67.97 643.39,-43.39"/>
+<text xml:space="preserve" text-anchor="middle" x="634.52" y="-82.8" font-family="SimHei, Arial, sans-serif" font-size="12.00">N</text>
+</g>
+<!-- R_UserTodo&#45;&#45;Todo -->
+<g id="edge22" class="edge">
+<title>R_UserTodo--Todo</title>
+<path fill="none" stroke="black" d="M289.4,-129.13C289.4,-105.35 289.4,-66.9 289.4,-43.28"/>
+<text xml:space="preserve" text-anchor="middle" x="293.73" y="-82.8" font-family="SimHei, Arial, sans-serif" font-size="12.00">N</text>
+</g>
+<!-- R_UserMsg&#45;&#45;Message -->
+<g id="edge24" class="edge">
+<title>R_UserMsg--Message</title>
+<path fill="none" stroke="black" d="M448.4,-129.13C448.4,-105.35 448.4,-66.9 448.4,-43.28"/>
+<text xml:space="preserve" text-anchor="middle" x="452.73" y="-82.8" font-family="SimHei, Arial, sans-serif" font-size="12.00">N</text>
+</g>
+</g>
+</svg>
