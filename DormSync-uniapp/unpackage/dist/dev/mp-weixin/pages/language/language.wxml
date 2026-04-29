@@ -1,1 +1,0 @@
-<view class="{{['data-v-143e30ec', 'page', b]}}"><view class="lang-card data-v-143e30ec"><view wx:for="{{a}}" wx:for-item="item" wx:key="c" class="lang-item data-v-143e30ec" bindtap="{{item.d}}"><text class="lang-name data-v-143e30ec">{{item.a}}</text><text wx:if="{{item.b}}" class="lang-check data-v-143e30ec">✓</text></view></view></view>
