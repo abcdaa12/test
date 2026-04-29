@@ -31,9 +31,38 @@ app.use('/api/finance', require('./routes/finance'))
 app.use('/api/schedule', require('./routes/schedule'))
 app.use('/api/announce', require('./routes/announce'))
 
-// 5. 健康检查接口
+// 5. 健康检查与测试推送接口
 app.get('/', (req, res) => {
     res.json({ code: 200, msg: 'DormSync API 服务运行中 🚀', data: null })
+})
+
+app.get('/api/test-push', async (req, res) => {
+    const { userId } = req.query
+    if (!userId) return res.json({ code: 400, msg: '请提供 userId' })
+    
+    // 引入 Message 模型，将模拟数据真实入库
+    const Message = require('./models/Message')
+    try {
+        const newMsg = await Message.create({
+            userId: userId,
+            type: 'finance',
+            content: '室友发起了一笔电费收款 ¥50',
+            status: 'unread'
+        })
+
+        // 调用 io 发送带有真实数据库 ID 的消息
+        io.to(userId).emit('new_message', {
+            _id: newMsg._id,
+            type: newMsg.type,
+            content: newMsg.content,
+            createTime: newMsg.createTime
+        })
+        
+        res.json({ code: 200, msg: '测试消息已入库并推送到用户: ' + userId })
+    } catch (e) {
+        console.error(e)
+        res.json({ code: 500, msg: '模拟推送失败' })
+    }
 })
 
 // 6. 全局错误处理（必须放在路由之后）
@@ -41,9 +70,38 @@ app.use(errorHandler)
 
 // 7. 连接数据库并启动服务
 const PORT = process.env.PORT || 3000
+const http = require('http')
+const { Server } = require('socket.io')
+
+// 创建 HTTP 服务器和 WebSocket 服务器
+const server = http.createServer(app)
+const io = new Server(server, {
+    cors: { origin: '*' } // 允许所有跨域请求
+})
+
+// 将 io 实例挂载到 app 上，方便在控制器中调用
+app.set('io', io)
+
+// 监听 WebSocket 连接
+io.on('connection', (socket) => {
+    console.log('✅ 新的 WebSocket 连接已建立，ID:', socket.id)
+
+    // 监听客户端发来的用户注册事件（绑定 socket 和 userId）
+    socket.on('register', (userId) => {
+        if (userId) {
+            socket.join(userId) // 让该 socket 加入以 userId 命名的房间
+            console.log(`👤 用户 ${userId} 成功连接 WebSocket`)
+        }
+    })
+
+    socket.on('disconnect', () => {
+        console.log('❌ WebSocket 连接已断开，ID:', socket.id)
+    })
+})
 
 connectDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`🚀 DormSync 服务已启动: http://localhost:${PORT}`)
+    // 注意：这里使用 server.listen 而不是 app.listen
+    server.listen(PORT, () => {
+        console.log(`🚀 DormSync 服务端(含 WebSocket)已启动: http://localhost:${PORT}`)
     })
 })

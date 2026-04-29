@@ -1,1 +1,13 @@
 /.work-master
+
+# Node.js
+node_modules/
+DormSync-server/node_modules/
+
+# UniApp
+DormSync-uniapp/unpackage/
+DormSync-uniapp/dist/
+
+# Mac / Windows
+.DS_Store
+Thumbs.db

@@ -14,12 +14,14 @@ const { createNotification } = require('./messageController')
 exports.createSchedule = async (req, res, next) => {
     try {
         const { dormId, weekLabel, cycle, items } = req.body
-        if (!dormId || !weekLabel || !items || !items.length) {
+        
+        // 核心修复：允许 items 为空数组（代表清空了所有排班）
+        if (!dormId || !weekLabel || !Array.isArray(items)) {
             return res.json({ code: 400, msg: '缺少必填参数', data: null })
         }
 
         const schedule = await Schedule.create({ dormId, weekLabel, cycle: cycle || 'weekly', items })
-        res.json({ code: 200, msg: '排班创建成功', data: schedule })
+        res.json({ code: 200, msg: '排班更新成功', data: schedule })
 
         // 异步通知：给明天值日的人发提醒
         try {
@@ -43,7 +45,7 @@ exports.createSchedule = async (req, res, next) => {
 }
 
 /**
- * 获取当前排班（最新一条）
+ * 获取当前排班（所有有效的排班记录合并）
  * GET /api/schedule/current?dormId=xxx
  */
 exports.getCurrentSchedule = async (req, res, next) => {
@@ -53,7 +55,14 @@ exports.getCurrentSchedule = async (req, res, next) => {
             return res.json({ code: 400, msg: '缺少参数 dormId', data: null })
         }
 
-        const schedule = await Schedule.findOne({ dormId }).sort({ createdAt: -1 })
+        // 获取最新的一条全量记录即可，因为我们现在是全量覆盖保存的
+        const schedule = await Schedule.findOne({ dormId }).sort({ _id: -1 })
+        
+        // 如果连一条记录都没有，返回空数组
+        if (!schedule) {
+             return res.json({ code: 200, msg: '查询成功', data: { items: [] } })
+        }
+
         res.json({ code: 200, msg: '查询成功', data: schedule })
     } catch (err) {
         next(err)
@@ -71,7 +80,7 @@ exports.getScheduleHistory = async (req, res, next) => {
             return res.json({ code: 400, msg: '缺少参数 dormId', data: null })
         }
 
-        const list = await Schedule.find({ dormId }).sort({ createdAt: -1 }).skip(1).limit(10)
+        const list = await Schedule.find({ dormId }).sort({ _id: -1 }).skip(1).limit(10)
         res.json({ code: 200, msg: '查询成功', data: list })
     } catch (err) {
         next(err)
@@ -116,17 +125,25 @@ exports.aiGenerate = async (req, res, next) => {
             dateList.push({ date: dateStr, weekday: weekdayNames[d.getDay()] })
         }
 
-        // 查询已有排班数据
-        const existingSchedules = await Schedule.find({ dormId }).sort({ createdAt: -1 })
+        // 查询已有排班数据 (由于 AI 可能会全盘重写，所以我们要获取当月的完整排班，供其参考)
+        const currentMonthStart = `${start.substring(0, 7)}-01`
+        const existingSchedules = await Schedule.find({ dormId }).sort({ _id: -1 }).limit(1)
         const existingMap = {}
-        existingSchedules.forEach(s => {
-            if (s.items) s.items.forEach(item => { if (!existingMap[item.date]) existingMap[item.date] = item.personName })
-        })
-        const existingInfo = dateList
-            .filter(d => existingMap[d.date])
-            .map(d => `${d.date}(${d.weekday}): ${existingMap[d.date]}`)
+        if (existingSchedules.length > 0) {
+            existingSchedules[0].items.forEach(item => {
+                if (item && item.date && !existingMap[item.date]) {
+                    existingMap[item.date] = item.personName
+                }
+            })
+        }
+        
+        // 提取当月已有排班
+        const existingInfo = Object.keys(existingMap)
+            .filter(d => d.startsWith(start.substring(0, 7))) // 只传当月给AI参考，免得太多
+            .map(d => `${d}: ${existingMap[d]}`)
+        
         const existingText = existingInfo.length > 0
-            ? `\n\n当前已有排班如下（请在此基础上调整，保留已有安排除非用户明确要求修改）：\n${existingInfo.join('\n')}`
+            ? `\n\n当前本月已有排班如下（请务必将这些记录原样包含在返回结果中，除非用户明确要求修改或删除某天）：\n${existingInfo.join('\n')}`
             : ''
 
         const systemPrompt = `你是一个宿舍排班助手。根据用户的需求，为宿舍成员生成合理的排班表。
@@ -144,10 +161,12 @@ exports.aiGenerate = async (req, res, next) => {
 注意：
 1. personName 必须是上述成员中的某一个，不能编造名字
 2. 每天最多安排一个人
-3. 如果某天不需要排班（如用户要求跳过周末、节假日等），则不要包含该天的记录
-4. 尽量公平分配，每人次数接近
-5. 充分考虑用户提出的特殊要求（如某人某天没空、换班、跳过某些日期等）
-6. 只返回需要排班的日期，不需要排班的日期直接省略`
+3. 如果用户明确要求删除/清空/取消某天或某些天的排班，请不要在返回的 JSON 数组中包含这些日期
+4. 如果某天不需要排班（如用户要求跳过周末、节假日等），则不要包含该天的记录
+5. 尽量公平分配，每人次数接近
+6. 充分考虑用户提出的特殊要求（如某人某天没空、换班、跳过某些日期等）
+7. 只返回需要排班的日期，不需要排班的日期直接省略
+8. 【特别注意】：如果用户只是要求修改或删除某几天的排班，请务必保留其他日期已有的排班记录（即把不需要修改的 existing 记录一并放在 JSON 中返回）`
 
         // 调用 DeepSeek API
         const aiRes = await axios.post('https://api.deepseek.com/chat/completions', {

@@ -2,7 +2,7 @@ export default {
     tab: {
         home: '首页',
         message: '消息',
-        more: '更多',
+        more: '管理',
         mine: '我的'
     },
     dorm: {

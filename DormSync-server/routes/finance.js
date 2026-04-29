@@ -12,5 +12,7 @@ const { authMiddleware } = require('../middlewares/jwt')
 router.post('/create', authMiddleware, financeController.createFinance)
 router.get('/list', authMiddleware, financeController.getFinanceList)
 router.delete('/delete', authMiddleware, financeController.deleteFinance)
+// 财务数据统计聚合（用于ECharts大屏）
+router.get('/statistics', authMiddleware, financeController.getFinanceStatistics)
 
 module.exports = router

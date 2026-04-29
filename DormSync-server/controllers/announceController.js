@@ -36,17 +36,23 @@ exports.createAnnounce = async (req, res, next) => {
 }
 
 /**
- * 获取公告列表
- * GET /api/announce/list?dormId=xxx
+ * 获取公告列表 (支持 limit 参数，用于首页跑马灯)
+ * GET /api/announce/list?dormId=xxx&limit=3
  */
 exports.getAnnounceList = async (req, res, next) => {
     try {
-        const { dormId } = req.query
+        const { dormId, limit } = req.query
         if (!dormId) return res.json({ code: 400, msg: '缺少参数 dormId', data: null })
 
-        const list = await Announce.find({ dormId })
+        let query = Announce.find({ dormId })
             .populate('creatorId', 'nickname')
             .sort({ createdAt: -1 })
+            
+        if (limit) {
+            query = query.limit(parseInt(limit))
+        }
+
+        const list = await query
 
         // 获取宿舍总人数
         const dorm = await Dorm.findById(dormId)

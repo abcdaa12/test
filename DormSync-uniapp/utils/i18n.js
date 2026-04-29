@@ -27,7 +27,11 @@ export const setLang = (lang) => {
 export const updateTabBar = () => {
     const tabs = ['home', 'message', 'more', 'mine']
     tabs.forEach((key, index) => {
-        uni.setTabBarItem({ index, text: t(`tab.${key}`) })
+        try {
+            uni.setTabBarItem({ index, text: t(`tab.${key}`) })
+        } catch (e) {
+            console.warn('非 TabBar 页面无法设置 TabBarItem', e)
+        }
     })
 }
 

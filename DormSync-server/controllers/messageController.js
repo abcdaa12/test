@@ -108,7 +108,7 @@ exports.deleteMessage = async (req, res, next) => {
 /**
  * 批量创建消息（内部调用，给宿舍成员发通知）
  */
-exports.createNotification = async ({ userIds, type, content }) => {
+exports.createNotification = async ({ userIds, type, content }, io) => {
     try {
         const messages = userIds.map(userId => ({
             userId,
@@ -116,7 +116,21 @@ exports.createNotification = async ({ userIds, type, content }) => {
             content,
             status: 'unread'
         }))
-        await Message.insertMany(messages)
+        const insertedMessages = await Message.insertMany(messages)
+
+        // 【WebSocket 实时推送】如果传入了 io 实例，则向对应的用户房间发送实时消息
+        if (io) {
+            insertedMessages.forEach(msg => {
+                // to(userId) 是 Socket.io 发送给特定房间（我们在 app.js 中用 userId 命名了房间）的方法
+                io.to(msg.userId.toString()).emit('new_message', {
+                    _id: msg._id,
+                    type: msg.type,
+                    content: msg.content,
+                    createTime: msg.createTime
+                })
+            })
+            console.log(`📡 WebSocket 成功推送 ${insertedMessages.length} 条新消息`)
+        }
     } catch (err) {
         console.error('创建通知失败', err)
     }
