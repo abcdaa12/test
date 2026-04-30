@@ -1,0 +1,47 @@
+@startuml
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 50
+
+entity "宿舍 Dorm" as Dorm {
+  * _id : ObjectId
+  --
+  dormNumber : String
+  notice : String
+  members : ObjectId[]
+  creator : ObjectId
+}
+
+entity "用户 User" as User {
+  * _id : ObjectId
+  --
+  openid : String
+  nickname : String
+  role : String
+  dormId : ObjectId
+}
+
+entity "排班 Schedule" as Schedule {
+  * _id : ObjectId
+  --
+  dormId : ObjectId
+  weekLabel : String
+  items : Array
+}
+
+entity "公告 Announce" as Announce {
+  * _id : ObjectId
+  --
+  dormId : ObjectId
+  title : String
+  creatorId : ObjectId
+  readBy : ObjectId[]
+}
+
+Dorm ||--o{ User : 包含 (1:N)
+Dorm ||--o{ Schedule : 安排 (1:N)
+Dorm ||--o{ Announce : 拥有 (1:N)
+User ||--o{ Schedule : 参与值日 (M:N)
+User ||--o{ Announce : 发布 (1:N)
+
+@enduml

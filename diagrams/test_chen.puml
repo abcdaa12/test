@@ -1,0 +1,31 @@
+@startuml
+left to right direction
+skinparam linetype ortho
+
+rectangle "用户" as User
+rectangle "宿舍" as Dorm
+
+diamond "创建" as Create
+diamond "属于" as Belong
+
+User "1" -- Create
+Create "N" -- Dorm
+
+Dorm "1" -- Belong
+Belong "N" -- User
+
+(id) as uid
+(openid) as uopenid
+(nickname) as unick
+
+User -- uid
+User -- uopenid
+User -- unick
+
+(id) as did
+(dorm_number) as dnum
+
+Dorm -- did
+Dorm -- dnum
+
+@enduml

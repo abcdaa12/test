@@ -202,7 +202,7 @@ export default {
         editDuty: '指定值日人',
         clearDuty: '清除排班',
         days: '天',
-        previewHint: 'AI 方案已显示在日历上（橙色），点击日期可调整，确认后保存'
+        previewHint: 'AI 方案已显示在日历上，点击日期可调整，确认后保存'
     },
     members: {
         title: '宿舍成员',

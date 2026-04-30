@@ -1,0 +1,44 @@
+@startuml
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 50
+
+entity "用户 User" as User {
+  * _id : ObjectId
+  --
+  openid : String
+  nickname : String
+  dormId : ObjectId
+}
+
+entity "财务记录 Finance" as Finance {
+  * _id : ObjectId
+  --
+  dormId : ObjectId
+  title : String
+  amount : Number
+  creatorId : ObjectId
+  payeeIds : ObjectId[]
+}
+
+entity "待办事项 Todo" as Todo {
+  * _id : ObjectId
+  --
+  userId : ObjectId
+  content : String
+}
+
+entity "消息 Message" as Message {
+  * _id : ObjectId
+  --
+  userId : ObjectId
+  type : String
+  content : String
+}
+
+User ||--o{ Finance : 发起收款 (1:N)
+User ||--o{ Finance : 参与分摊 (M:N)
+User ||--o{ Todo : 创建 (1:N)
+User ||--o{ Message : 接收 (1:N)
+
+@enduml

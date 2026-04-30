@@ -1,56 +1,39 @@
 @startuml
-skinparam sequenceMessageAlign center
+skinparam monochrome true
+skinparam maxMessageSize 100
 skinparam responseMessageBelowArrow true
-skinparam style strictuml
+hide footbox
 
-actor "宿舍成员" as user
-participant "前端页面" as front
-participant "后端控制器\ndecisionController" as backend
-database "MongoDB\nDecision集合" as db
-participant "消息模块\nmessageController" as msg
+actor Student
+participant HomeUI
+participant DecisionUI
+participant DecisionController
+participant decision_record
 
-== 发起投票 ==
+activate Student
 
-user -> front : 填写投票主题、添加选项\n设置截止时间、匿名开关
-front -> front : 前端校验\n(主题非空、选项≥2、已选日期)
+Student -> HomeUI: 进入首页
+activate HomeUI
 
-alt 校验失败
-    front --> user : 提示错误信息
-else 校验通过
-    front -> backend : POST /api/decision/create\n{dormId, title, options, deadline, creatorId, anonymous}
-    backend -> backend : 验证参数有效性\n格式化选项数组(count初始为0)
-    backend -> db : 创建投票文档
-    db --> backend : 返回创建结果
-    backend --> front : {code:200, msg:"决策发起成功"}
-    front --> user : 提示创建成功\n刷新投票列表
+HomeUI -> DecisionUI: 页面跳转
+activate DecisionUI
+deactivate HomeUI
 
-    backend ->> msg : 异步调用 createNotification
-    msg -> db : 批量创建投票通知\n(通知除发起人外的宿舍成员)
-end
+DecisionUI -> DecisionController: 提交投票数据
+activate DecisionController
 
-== 参与投票 ==
+DecisionController -> DecisionController: 检查数据是否合法
+DecisionController -> decision_record: 保存投票记录
+activate decision_record
 
-user -> front : 点击选项进行投票
-front -> backend : POST /api/decision/vote\n{decisionId, optionIndex}
-backend -> db : 查询投票文档
-db --> backend : 返回投票数据
+decision_record --> DecisionController: 保存成功
+deactivate decision_record
 
-backend -> backend : 多重验证
+DecisionController --> DecisionUI: 返回保存成功信息
+deactivate DecisionController
 
-alt 投票已结束
-    backend --> front : {code:400, msg:"投票已结束"}
-    front --> user : 提示投票已结束
-else 已超过截止时间
-    backend --> front : {code:400, msg:"投票已过截止时间"}
-    front --> user : 提示已过截止时间
-else 用户已投过票
-    backend --> front : {code:400, msg:"你已经投过票了"}
-    front --> user : 提示重复投票
-else 验证通过
-    backend -> db : 更新选项票数+1\n记录投票用户和选项
-    db --> backend : 返回更新结果
-    backend --> front : {code:200, msg:"投票成功"}
-    front --> user : 显示投票结果百分比
-end
+DecisionUI --> Student: 显示"保存成功"
+deactivate DecisionUI
 
+deactivate Student
 @enduml
